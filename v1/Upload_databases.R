@@ -14,90 +14,85 @@ lon_lat_nan<-read.table("data/LITTER/lon_lat_pairs.txt",header = TRUE)
 ###############
 #Uncompress files
 
-if(!is.null("data/SOIL/Clay_WGS84.nc")){
+if(!file.exists("data/SOIL/Clay_WGS84.nc")){
   bunzip2("data/SOIL/Clay_WGS84.nc.bz2",
                         ext="bz2", FUN=bzfile)}
 
 
-if(!is.null("data/SOIL/CN_WGS84.nc")){
+if(!file.exists("data/SOIL/CN_WGS84.nc")){
   bunzip2("data/SOIL/CN_WGS84.nc.bz2", 
                       ext="bz2", FUN=bzfile)}
 
-if(!is.null("data/SOIL/Silt_WGS84.nc")){
+if(!file.exists("data/SOIL/Silt_WGS84.nc")){
   Silt_file_path<-bunzip2("data/SOIL/Silt_WGS84.nc.bz2", 
                         ext="bz2", FUN=bzfile)}
 
-if(!is.null("data/SOIL/socstockseu26_WGS84.nc")){
+if(!file.exists("data/SOIL/socstockseu26_WGS84.nc")){
   bunzip2("data/SOIL/socstockseu26_WGS84.nc.bz2", 
                        ext="bz2", FUN=bzfile)}
 
-if(!is.null("data/SOIL/Bulk_density_WGS84.nc")){
+if(!file.exists("data/SOIL/Bulk_density_WGS84.nc")){
   BD_file_path<-bunzip2("data/SOIL/Bulk_density_WGS84.nc.bz2", 
                       ext="bz2", FUN=bzfile)}
 
 
 
 ##
-if(!is.null("data/LITTER/npp_average_rcp26_EU_annual_2006_2099_fixed.nc4")){
+if(!file.exists("data/LITTER/npp_average_rcp26_EU_annual_2006_2099_fixed.nc4")){
   bunzip2("data/LITTER/npp_average_rcp26_EU_annual_2006_2099_fixed.nc4.bz2", 
                                 ext="bz2", FUN=bzfile)}
 
-if(!is.null("data/LITTER/npp_average_rcp60_EU_annual_2006_2099_fixed.nc4")){
+if(!file.exists("data/LITTER/npp_average_rcp60_EU_annual_2006_2099_fixed.nc4")){
   bunzip2("data/LITTER/npp_average_rcp60_EU_annual_2006_2099_fixed.nc4.bz2", 
                                 ext="bz2", FUN=bzfile)}
 
-if(!is.null("data/LITTER/npp_average_rcp60_EU_annual_2006_2099_var.nc4")){
+if(!file.exists("data/LITTER/npp_average_rcp60_EU_annual_2006_2099_var.nc4")){
   bunzip2("data/LITTER/npp_average_rcp60_EU_annual_2006_2099_var.nc4.bz2", 
                                     ext="bz2", FUN=bzfile)}
 
-if(!is.null("data/LITTER/npp_average_rcp26_EU_annual_2006_2099_var.nc4")){
+if(!file.exists("data/LITTER/npp_average_rcp26_EU_annual_2006_2099_var.nc4")){
   bunzip2("data/LITTER/npp_average_rcp26_EU_annual_2006_2099_var.nc4.bz2", 
                                     ext="bz2", FUN=bzfile)}
 
 
-if(!is.null("data/LITTER/cveg_average_rcp26_EU_annual_2006_2099.nc4")){
+if(!file.exists("data/LITTER/cveg_average_rcp26_EU_annual_2006_2099.nc4")){
   bunzip2("data/LITTER/cveg_average_rcp26_EU_annual_2006_2099.nc4.bz2", 
                                        ext="bz2", FUN=bzfile)}
 
-if(!is.null("data/LITTER/cveg_average_rcp60_EU_annual_2006_2099.nc4")){
-  bunzip2("data/LITTER/cveg_average_rcp60_EU_annual_2006_2099.nc4.bz2", 
-                                       ext="bz2", FUN=bzfile)}
-
-
 
 #####
-if(!is.null("data/RCP26/DAILY_FORCING/tas_month_rcp26_2006_2100_mm.nc4")){
+if(!file.exists("data/RCP26/DAILY_FORCING/tas_month_rcp26_2006_2100_mm.nc4")){
   bunzip2("data/RCP26/DAILY_FORCING/tas_month_rcp26_2006_2100_mm.nc4.bz2", 
                                ext="bz2", FUN=bzfile)}
 
-if(!is.null("data/RCP26/DAILY_FORCING/prec_month_rcp26_2006_2100_mm.nc4")){
+if(!file.exists("data/RCP26/DAILY_FORCING/prec_month_rcp26_2006_2100_mm.nc4")){
   bunzip2("data/RCP26/DAILY_FORCING/prec_month_rcp26_2006_2100_mm.nc4.bz2", 
                                 ext="bz2", FUN=bzfile)}
 
-if(!is.null("data/RCP26/MONTHLY_OUTPUTS/soilmoist_2006_2009_rcp26_mm3mm3_top18_mm.nc4")){
+if(!file.exists("data/RCP26/MONTHLY_OUTPUTS/soilmoist_2006_2009_rcp26_mm3mm3_top18_mm.nc4")){
   bunzip2("data/RCP26/MONTHLY_OUTPUTS/soilmoist_2006_2009_rcp26_mm3mm3_top18_mm.nc4.bz2", 
                                 ext="bz2", FUN=bzfile)}
 
 
 
 
-if(!is.null("data/RCP26/MONTHLY_OUTPUTS/potevap_month_rcp26_2006_2100_mm.nc4")){
+if(!file.exists("data/RCP26/MONTHLY_OUTPUTS/potevap_month_rcp26_2006_2100_mm.nc4")){
   bunzip2("data/RCP26/MONTHLY_OUTPUTS/potevap_month_rcp26_2006_2100_mm.nc4.bz2", 
                                    ext="bz2", FUN=bzfile)}
 
-if(!is.null("data/RCP60/MONTHLY_OUTPUTS/soilmoist_2006_2009_rcp60_mm3mm3_top18_mm.nc4")){
+if(!file.exists("data/RCP60/MONTHLY_OUTPUTS/soilmoist_2006_2009_rcp60_mm3mm3_top18_mm.nc4")){
   bunzip2("data/RCP60/MONTHLY_OUTPUTS/soilmoist_2006_2009_rcp60_mm3mm3_top18_mm.nc4.bz2", 
                                 ext="bz2", FUN=bzfile)}
 
-if(!is.null("data/RCP60/MONTHLY_OUTPUTS/potevap_month_rcp60_2006_2100_mm.nc4")){
+if(!file.exists("data/RCP60/MONTHLY_OUTPUTS/potevap_month_rcp60_2006_2100_mm.nc4")){
   bunzip2("data/RCP60/MONTHLY_OUTPUTS/potevap_month_rcp60_2006_2100_mm.nc4.bz2", 
                                   ext="bz2", FUN=bzfile)}
 
-if(!is.null("data/RCP60/DAILY_FORCING/prec_month_rcp60_2006_2100_mm.nc4")){
+if(!file.exists("data/RCP60/DAILY_FORCING/prec_month_rcp60_2006_2100_mm.nc4")){
   bunzip2("data/RCP60/DAILY_FORCING/prec_month_rcp60_2006_2100_mm.nc4.bz2", 
                                ext="bz2", FUN=bzfile)}
 
-if(!is.null("data/RCP60/DAILY_FORCING/tas_month_rcp60_2006_2100_mm.nc4")){
+if(!file.exists("data/RCP60/DAILY_FORCING/tas_month_rcp60_2006_2100_mm.nc4")){
   bunzip2("data/RCP60/DAILY_FORCING/tas_month_rcp60_2006_2100_mm.nc4.bz2", 
                               ext="bz2", FUN=bzfile)}
 
