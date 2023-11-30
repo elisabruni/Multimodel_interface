@@ -1006,7 +1006,7 @@ body<- dashboardBody(
                   icon("youtube", style = "margin-right: 5px; font-size: 1.5em;"),
                   HTML("<h4><span class='bolder-text'> Tutorial</span></h4>")
                 ),
-                tags$video(src='webtool_tutorial_v1.mov', type="video/mov", 
+                tags$video(src='webtool_tutorial_v1.mp4', type="video/mp4", 
                            width=2846/5, height=1684/5, controls="controls")
               )),
               column(5,
