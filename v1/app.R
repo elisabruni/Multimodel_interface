@@ -76,28 +76,35 @@ body<- dashboardBody(
     #--------Project tab----
     #-----------------------
     tabItem(tabName = "Project", 
+            # fluidRow(
+            #   column(10,HTML("<h2><span class='bolder-text'>Project</span></h2>")),
+            #   column(10,
+            #          uiOutput("tabHOLI2"))),
+            # fluidRow(
+            #   column(10,HTML("<h2><span class='bolder-text'>Multi-model ensembles</span></h2>")),
+            #   column(10, HTML("<h4 style='text-align: justify;'>
+            #   One of the goals of HoliSoils is to develop and improve state-of-the-art soil models 
+            #                   to predict the <span class='bolder-text'>effect of land management changes</span>  on forest soils. 
+            #                   In order to benefit from the complementarity of different soil organic carbon (SOC) models,
+            #                   the project aims to predict SOC stocks and greenhouse gas (GHG) emissions in forest soils 
+            #                   with a multi-model ensemble.
+            #                   That is, an ensemble of structurally different SOC models that can predict 
+            #                   the evolution of SOC stocks and GHG gases emissions and provide the associated <span class='bolder-text'>level of uncertainty</span>.
+            #                   </h4>"))),
             fluidRow(
-              column(10,HTML("<h2><span class='bolder-text'>Project</span></h2>")),
-              column(10,
-                     uiOutput("tabHOLI2"))),
+              column(10,HTML("<h2><span class='bolder-text'>Multi-model ensemble interface</span></h2>")),
+              column(10, HTML("<h4 style='text-align: justify;'>This webtool is designed to run a multi-model ensemble over
+              <span class='bolder-text'>European forest sites</span>. It allows to predict the effect of climate, land-use and land management changes on  
+                     <span class='bolder-text'>soil organic carbon</span> (SOC) stocks and <span class='bolder-text'>greenhouse gas</span> (GHG) emissions. By benefitting from the complementarity of
+                     structurally different SOC models, it provides the level of uncertainty
+                     of the predictions.</h4>"))
+            ),
             fluidRow(
-              column(10,HTML("<h2><span class='bolder-text'>Multi-model ensembles</span></h2>")),
-              column(10, HTML("<h4 style='text-align: justify;'>
-              One of the goals of HoliSoils is to develop and improve state-of-the-art soil models 
-                              to predict the <span class='bolder-text'>effect of land management changes</span>  on forest soils. 
-                              In order to benefit from the complementarity of different soil organic carbon (SOC) models,
-                              the project aims to predict SOC stocks and greenhouse gas (GHG) emissions in forest soils 
-                              with a multi-model ensemble.
-                              That is, an ensemble of structurally different SOC models that can predict 
-                              the evolution of SOC stocks and GHG gases emissions and provide the associated <span class='bolder-text'>level of uncertainty</span>.
-                              </h4>"))),
-            fluidRow(
-              column(10,HTML("<h2><span class='bolder-text'>Webtool</span></h2>")),
+              column(10,HTML("<h2><span class='bolder-text'>Features</span></h2>")),
               column(10,
                      uiOutput("Download_documentation")),
               column(12,h4(" ")),
-              column(10, DTOutput("data_ref_list"))
-            ),
+              column(10, DTOutput("data_ref_list"))),
             fluidRow(
               column(10,HTML("<h2><span class='bolder-text'>Limitations</span></h2>")),
               column(10,HTML("<h4 style='text-align: justify;'>
@@ -997,7 +1004,7 @@ body<- dashboardBody(
             fluidRow(
               column(10,HTML("<h2><span class='bolder-text'>About the multi-model ensemble</span></h2>")),
               column(10,
-                     uiOutput("tabHOLI"))),
+                     uiOutput("tabHOLI2"))),
             fluidRow(h4(" ")),
             fluidRow(
               column(10,tagList(
@@ -5181,11 +5188,10 @@ in French Long-Term Experiments.”
   
   output$Download_documentation <- renderUI({
     tagList(HTML("<h4 style='text-align: justify;display: inline;'>
-    This webtool is designed to allow the user to run a multi-model ensemble over <span class='bolder-text'>European forest sites</span>.
                      The user is asked to input the geographic coordinates of the site of interest, 
                      and provide additional data on pedoclimatic and forest management conditions.
                      In case some of the data is not available, the webtool directly extracts the required data
-                     from open source databases. Sources and references are listed in the table below and 
+                     from <span class='bolder-text'>open source databases</span>. Sources and references are listed in the table below and 
                      more information can be found in the </h4>"),link_to_documentation)
   })
   
@@ -5210,22 +5216,23 @@ in French Long-Term Experiments.”
   #Holisoils website
   #url7 <- a(h4("HoliSoils", style = "display: inline; font-family: courier;"), href="https://holisoils.eu/")
   url7 <- a(h4("HoliSoils", style = "display: inline;"), href="https://holisoils.eu/",target = "_blank")
-  output$tabHOLI <- renderUI({
-    tagList(HTML("<h4 style='text-align: justify;display: inline;'>This webtool was designed within the "),
-            url7,HTML("<h4 style='text-align: justify;display: inline;'> project framework."))
-  })
+  # output$tabHOLI <- renderUI({
+  #   tagList(HTML("<h4 style='text-align: justify;display: inline;'>This webtool was designed within the "),
+  #           url7,HTML("<h4 style='text-align: justify;display: inline;'> project framework."))
+  # })
   
   output$tabHOLI2 <- renderUI({
-    tagList(url7,HTML("<h4 style='text-align: justify;display: inline;'> - Holistic management practices, 
-         modelling and monitoring European forest soils -
-           is a <span class='bolder-text'>Horizon 2020</span> project that
+    tagList(HTML("<h4 style='text-align: justify;display: inline;'>This webtool was designed within the "),
+    url7,HTML("<h4 style='text-align: justify;display: inline;'> - Holistic management practices, 
+         modelling and monitoring European forest soils - project framework. Holisoils 
+         is a <span class='bolder-text'>Horizon 2020</span> project that
          aims to harmonise available soil monitoring information
          in European forests to support decision making towards 
          climate and sustainability goals.</h4>"))
   })
   
   url_githubcode <- a(h4("Code", style = "display: inline;"), 
-                      href="https://github.com/elisabruni/Holisoils-multimodel",target = "_blank")
+                      href="https://github.com/elisabruni/Multimodel_interface",target = "_blank")
   output$githubcode <- renderUI({
     url_githubcode
   })
