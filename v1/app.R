@@ -1183,7 +1183,7 @@ server <- function(input, output,session) {
   #------------------------------------------------------
   validate_lon_lat <- function(lon, lat) {
     
-    validate(
+    shiny::validate(
       need(!is.na(lat) && !is.na(lon),
            "Please enter valid latitude and longitude.")
     )
@@ -1212,7 +1212,7 @@ server <- function(input, output,session) {
   output$map_data <- renderLeaflet({
     # Validate input values
     
-    validate(
+    shiny::validate(
       need(!is.null(input$coordsLAT) && !is.null(input$coordsLON),
            "Please enter valid latitude and longitude.")
     )
