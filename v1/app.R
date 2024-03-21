@@ -114,7 +114,7 @@ body<- dashboardBody(
                      Thus, when possible, measurements should be prioritized.
                      Also, the multi-model ensemble uses default model parameter values.
                      Models should be <span class='bolder-text'> calibrated and validated</span> with observed data 
-                     befaure applying them for predictions.
+                     before applying them for predictions.
                              </h4>"))
             )
     ),
@@ -232,9 +232,8 @@ body<- dashboardBody(
                      column(10,img(src = "Land_management_scheme_forsite.png", height = 1120/3 , width = 968/3 )),
                      column(8,HTML("<h5><span class='bolder-text'>Figure </span>
                              Representation of the assumptions made to calculate the litter input
-                             following a disturbance event. On the left side of the image,
-                             equations used to calculate the different variables are presented, 
-                             while the right side shows a stylized representation of these variables.
+                             following a disturbance event. The image shows the disturbance scnenario (on the left)
+                             and the control (on the right).
                              </h5>")),
                      br()
             )#Fluidrow
@@ -270,8 +269,8 @@ body<- dashboardBody(
                                           span(
                                             `data-toggle` = "tooltip", `data-placement` = "below",
                                             title = "Select the geographical coordinates 
-                                            of the site (in decimal degrees). Note that only locations in
-                                            European continental surface area will work.",
+                                            of the site (in decimal degrees). Note that data will be extracted only for locations in
+                                            European continental surface area.",
                                             icon("info-circle")
                                           )
                                    )
@@ -521,7 +520,7 @@ body<- dashboardBody(
                                                    title = "Lignin to nitrogen ratio of the litter input. If no data is available, 
                                                    a species-specific value is calculated as the product of the carbon to nitrogen ratio
                                                    and the lignin to carbon ratio, where the carbon to nitrogen ratio of the litter input
-                                                   is derived from the TRY database for each species, and the percentage of carbon in the litter input
+                                                   is derived from the TRY database for each species, the lignin content is considered equal to the neither soluble nor hydrolisable compound fraction of the litter input, and the percentage of carbon in the litter input
                                                    is considered as 48.2% for all species (Ma et al., 2018).",
                                                    icon("info-circle")
                                                  ))
@@ -544,7 +543,7 @@ body<- dashboardBody(
                                           column(1,
                                                  span(
                                                    `data-toggle` = "tooltip", `data-placement` = "below",
-                                                   title = "Woody litter size of the litter input (cm). If no data is available, 
+                                                   title = "Diameter of the woody litter input (cm). If no data is available, 
                                                    a default value of 2 cm will be used (Tuomi et al., 2009).",
                                                    icon("info-circle")
                                                  ))
