@@ -26,7 +26,7 @@ library(PCICt)
 library(lubridate)
 library(DT)
 library(leaflet)
-
+library(R.utils)
 
 #---------------------------
 #Call required functions
