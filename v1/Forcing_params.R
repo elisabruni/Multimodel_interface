@@ -1,4 +1,5 @@
 #Forcing
+#library(readxl)
 library(dplyr)
 #---------------------------
 #USER DEFINED PARAMETERS
@@ -34,9 +35,12 @@ ph_site = 6.
 #CH4_conc_site=1858 #ppb atmospheric CH4 concentration
 
 #CN ratio by plant species from TRY database
-df_CH4 = read_excel("data/ch4_annmean_gl.xls",
-                     col_names = TRUE,skip=0)
-df_CH4 = df_CH4[c(2:length(df_CH4$year)),] #ppb
+#df_CH4 = read_excel("data/ch4_annmean_gl.xls", col_names = TRUE,skip=0)
+#df_CH4 = df_CH4[c(2:length(df_CH4$year)),] #ppb
+df_CH4 = read.csv("data/ch4_annmean_gl.csv",
+                   header = TRUE)
+df_CH4 = df_CH4[-1, ] #ppb
+#print(df_CH4)
 
 #AWEN values from Yasso manualii
 df_AWEN = read_excel("data/AWEN_values_tree_species.xlsx",

@@ -4,16 +4,29 @@ css <- '
 body {
   font-family: Roboto, sans-serif;
   text-align: justify;
+  color: black; /* Text color */
+  font-weight: 1000; /* This makes the text bolder */
 }
 p {
       font-family: Roboto, sans-serif;
+      color: black; /* Text color */
+      font-weight: 1000; /* This makes the text bolder */
 }
 a {
       font-family: Roboto, sans-serif;
+      font-weight: 1000; /* This makes the text bolder */    
+      
     }
 h1, h2, h3, h4, h5, h6 {
       font-family: Roboto, sans-serif;
-    }
+      color: black; /* Text color */
+      font-weight: 1000; /* This makes the text bolder */
+}
+    
+a h1, a h2, a h3, a h4, a h5, a h6 {
+  color: inherit;
+}
+    
 .content-wrapper {background-color: #F2F3F4;}
 .tooltip {
 pointer-events: none;
@@ -36,7 +49,8 @@ border-right-color: #73AD21;
 }
 .bolder-text {
         font-family: Roboto, sans-serif;
-        font-weight: 1000; /* This makes the text bolder */
+        color: black; /* Text color */
+        font-weight: 2000; /* This makes the text bolder */
         -webkit-text-stroke: 0.3px black; /* Adjust the width and color for desired effect */
         color: black; /* Text color */
 }
@@ -53,6 +67,7 @@ background-color: #E5E4E2; /* Set the desired background color */
 #downloadData_FixedLU:hover,#downloadData_LUchange:hover,#downloadData_LM:hover {
 background-color: #D3D3D3; /* Set the background color on hover */
 }
+.main-header .logo { font-size: 30px; }
 table {
         border-collapse: collapse;
         width: 100%;

@@ -153,38 +153,38 @@ Yasso07Modelfi <- function (t, #years
   return(Mod)
 }
 
-###########
-# TEST
-###########
-
-# #-------
-years=seq(from=1,to=10,by=1)#/365)
-
-#Litter=data.frame(year=c(1:10),Litter=rnorm(n=10,mean=10,sd=2))
-Litter=data.frame(year=c(1:10),Litter=rep(8,10))
-TempData=data.frame(years,Temp=15+sin(2*pi*years)+
-                      rnorm(n=length(years),mean=0,sd=1))
-j=length(years) # how many years we simulate 
-MeanTemperature <- TempData$Temp  
-TemperatureAmplitude <- rep(diff(range(TempData[,2]))/2,j) # temperature amplitude 
-Precipitation <- rep(800,j) # precipitation 800mm
-
-MT=MeanTemperature
-TA=TemperatureAmplitude
-PR_mm=Precipitation
-#PR_mm=Precip_year$Precip
-#note conversion from mm to meters in the model's environmental function
-
-
-# EXAMPLE of fixed model ##
-# Modified yasso07 C. Sierra general model WITH environmental effect 
-yassofix <- Yasso07Modelfi(years,
-                           C0=rep(0,5), #initial carbon
-                           AWEN = c(0.52,0.18,0.08,0.2,0), #to separate litter to yasso AWEN pools, this depends on plant organ and species
-                           In=Litter,#litter C input (same length as years)
-                           xi = 0, # only xi = 1  will replace climate data no climate effect,
-                           MT=MT,#MeanTemperature
-                           TA=TA, #TemperatureAmplitude
-                           PR_mm=PR_mm,#Precipitation_mm)
-                           WS=2) 
-getC(yassofix)
+# ###########
+# # TEST
+# ###########
+# 
+# # #-------
+# years=seq(from=1,to=10,by=1)#/365)
+# 
+# #Litter=data.frame(year=c(1:10),Litter=rnorm(n=10,mean=10,sd=2))
+# Litter=data.frame(year=c(1:10),Litter=rep(8,10))
+# TempData=data.frame(years,Temp=15+sin(2*pi*years)+
+#                       rnorm(n=length(years),mean=0,sd=1))
+# j=length(years) # how many years we simulate 
+# MeanTemperature <- TempData$Temp  
+# TemperatureAmplitude <- rep(diff(range(TempData[,2]))/2,j) # temperature amplitude 
+# Precipitation <- rep(800,j) # precipitation 800mm
+# 
+# MT=MeanTemperature
+# TA=TemperatureAmplitude
+# PR_mm=Precipitation
+# #PR_mm=Precip_year$Precip
+# #note conversion from mm to meters in the model's environmental function
+# 
+# 
+# # EXAMPLE of fixed model ##
+# # Modified yasso07 C. Sierra general model WITH environmental effect 
+# yassofix <- Yasso07Modelfi(years,
+#                            C0=rep(0,5), #initial carbon
+#                            AWEN = c(0.52,0.18,0.08,0.2,0), #to separate litter to yasso AWEN pools, this depends on plant organ and species
+#                            In=Litter,#litter C input (same length as years)
+#                            xi = 0, # only xi = 1  will replace climate data no climate effect,
+#                            MT=MT,#MeanTemperature
+#                            TA=TA, #TemperatureAmplitude
+#                            PR_mm=PR_mm,#Precipitation_mm)
+#                            WS=2) 
+# C_yasso<-getC(yassofix)

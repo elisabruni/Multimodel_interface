@@ -59,6 +59,11 @@ if(!file.exists("data/LITTER/cveg_average_rcp26_EU_annual_2006_2099.nc4")){
   bunzip2("data/LITTER/cveg_average_rcp26_EU_annual_2006_2099.nc4.bz2", 
                                        ext="bz2", FUN=bzfile)}
 
+# if(!!file.exists("data/LITTER/cveg_average_rcp60_EU_annual_2006_2099.nc4")){
+#   bunzip2("data/LITTER/cveg_average_rcp60_EU_annual_2006_2099.nc4.bz2", 
+#                                        ext="bz2", FUN=bzfile)}
+
+
 
 #####
 if(!file.exists("data/RCP26/DAILY_FORCING/tas_month_rcp26_2006_2100_mm.nc4")){

@@ -28,6 +28,7 @@ library(DT)
 library(leaflet)
 library(R.utils)
 
+
 #---------------------------
 #Call required functions
 #---------------------------
@@ -54,8 +55,9 @@ source("Yasso20Model.R")
 source("ICBM_environmental_functions.R")
 #---------------------------
 #Load databases
-source("Upload_databases.R")
+#source("Upload_databases.R")
 
+lon_lat_nan<-read.table("data/LITTER/lon_lat_pairs.txt",header = TRUE)
 
 #--------------------------#--------------------------#--------------------------#--------------------------
 #--------BODY----#--------------------------#--------------------------#--------------------------
@@ -92,12 +94,14 @@ body<- dashboardBody(
             #                   the evolution of SOC stocks and GHG gases emissions and provide the associated <span class='bolder-text'>level of uncertainty</span>.
             #                   </h4>"))),
             fluidRow(
-              column(10,HTML("<h2><span class='bolder-text'>Multi-model ensemble interface</span></h2>")),
-              column(10, HTML("<h4 style='text-align: justify;'>This webtool is designed to run a multi-model ensemble over
+              column(10,HTML("<h1><span class='bolder-text'>me4soc</span></h1>")),
+              column(10, HTML("<h4 style='text-align: justify;'> <span class='bolder-text'>me4soc - Multi-model Ensemble interface for Soil Organic Carbon predictions -</span> is a webtool designed to run a multi-model ensemble over
               <span class='bolder-text'>European forest sites</span>. It allows to predict the effect of climate, land-use and land management changes on  
                      <span class='bolder-text'>soil organic carbon</span> (SOC) stocks and <span class='bolder-text'>greenhouse gas</span> (GHG) emissions. By benefitting from the complementarity of
                      structurally different SOC models, it provides the level of uncertainty
-                     of the predictions.</h4>"))
+                     of the predictions.</h4>")),
+              column(10,
+                     uiOutput("tabHOLI1"))
             ),
             fluidRow(
               column(10,HTML("<h2><span class='bolder-text'>Features</span></h2>")),
@@ -114,7 +118,7 @@ body<- dashboardBody(
                      Thus, when possible, measurements should be prioritized.
                      Also, the multi-model ensemble uses default model parameter values.
                      Models should be <span class='bolder-text'> calibrated and validated</span> with observed data 
-                     before applying them for predictions.
+                     befaure applying them for predictions.
                              </h4>"))
             )
     ),
@@ -139,16 +143,16 @@ body<- dashboardBody(
                            that can be summarized with the following matrix equation:")), 
               br(),
               #div("$$\\alpha+\\beta$$ dC/dt=I(t)-A∙K∙ξ(t)∙C(t)"),
-              column(10,h4(style="font-family: Roboto, sans-serif;",
+              column(10,h4(style="font-family: Roboto, sans-serif; color: black; font-weight: 1000;",
                            "$\\frac{d\\mathbf{C}}{dt}=\\mathbf{I}(t)- ξ(t)\\times \\mathbf{A} \\times \\mathbf{K}\\times \\mathbf{C}(t),\\mathbf{\\ }\\mathbf{\\  } \\mathbf{\\ } \\mathbf{\\  } \\mathbf{C}(t=0)=\\mathbf{C}_{0},$")),
               column(10,h4("Where:") ),
-              column(10,  withMathJax( h4(style = "font-family: Roboto, sans-serif;","● $\\mathbf{C}(t)$ is a nx1 vector describing the mass of SOC in the n compartments as a function of time (t);"))),
-              column(10,  withMathJax( h4(style = "font-family: Roboto, sans-serif;","● $\\mathbf{I}(t)$ is a nx1 vector representing the C inputs to the soil;"))),
-              column(10,  withMathJax( h4(style = "font-family: Roboto, sans-serif;","● $ξ(t)$ is the scalar effect of the pedo-climatic conditions on the decomposition of SOC;"))),
-              column(10,  withMathJax( h4(style = "font-family: Roboto, sans-serif;","● $\\mathbf{A}$ is a nxn matrix describing the mass flow among each compartment.
+              column(10,  withMathJax( h4(style = "font-family: Roboto, sans-serif; color: black; font-weight: 1000;","● $\\mathbf{C}(t)$ is a nx1 vector describing the mass of SOC in the n compartments as a function of time (t);"))),
+              column(10,  withMathJax( h4(style = "font-family: Roboto, sans-serif; color: black; font-weight: 1000;","● $\\mathbf{I}(t)$ is a nx1 vector representing the C inputs to the soil;"))),
+              column(10,  withMathJax( h4(style = "font-family: Roboto, sans-serif; color: black; font-weight: 1000;","● $ξ(t)$ is the scalar effect of the pedo-climatic conditions on the decomposition of SOC;"))),
+              column(10,  withMathJax( h4(style = "font-family: Roboto, sans-serif; color: black; font-weight: 1000;","● $\\mathbf{A}$ is a nxn matrix describing the mass flow among each compartment.
                                           Its elements ${a}_{i,j}$ represent the flow of SOC from compartment j to compartment i, for i, j = 1,...,n;"))),
-              column(10,  withMathJax( h4(style = "font-family: Roboto, sans-serif;","● $\\mathbf{K}$ is a nxn diagonal matrix containing the decomposition coefficients of the n compartments;"))),
-              column(10,  withMathJax( h4(style = "font-family: Roboto, sans-serif;","● $\\mathbf{C}_{0}$ is a nx1 vector representing the initial level of SOC in each compartment at t=0.")))
+              column(10,  withMathJax( h4(style = "font-family: Roboto, sans-serif; color: black; font-weight: 1000;","● $\\mathbf{K}$ is a nxn diagonal matrix containing the decomposition coefficients of the n compartments;"))),
+              column(10,  withMathJax( h4(style = "font-family: Roboto, sans-serif; color: black; font-weight: 1000;","● $\\mathbf{C}_{0}$ is a nx1 vector representing the initial level of SOC in each compartment at t=0.")))
               ,
               br(),
               column(10,HTML("<h3><span class='bolder-text'>Simulations of CO<sub>2</sub> fluxes</span></h3>")),
@@ -234,7 +238,7 @@ body<- dashboardBody(
                              Representation of the assumptions made to calculate the litter input
                              following a disturbance event. The image shows the disturbance scnenario (on the left)
                              and the control (on the right).
-                             </h5>")),
+                             </h5>")), 
                      br()
             )#Fluidrow
     )#tabitem
@@ -244,16 +248,20 @@ body<- dashboardBody(
     ############################################################################################
     tabItem(tabName = "Data1", 
             HTML("<h2><span class='bolder-text'>Data input</span></h2>"),
-            h4("This is the data input required to run the multi-model ensemble."),
+            h4("This is the data input required to run the multi-model ensemble.
+               The fields are initialized with data from global open-source databases. 
+               Go through all the panels and, when possible, modify the fields with site measurements."),
             # Output: Tabset w/ plot, summary, and table ----
             ############################################################################################
             ########################## TABSET PANEL DATA INPUT  ########################################
             ############################################################################################    
-            tabsetPanel(type = "tabs",
+            tabsetPanel(id="mainDataPanel",
+                        type = "tabs",
                         ############################################################################################
                         ########################## TAB PANEL SIMULATION SETUP ######################################
                         ############################################################################################  
-                        tabPanel(h4("Simulations setup"), 
+                        tabPanel(value="simusetuppanel",
+                                 title=h4("Simulations setup"), 
                                  fluidRow(
                                    column(10,
                                           h4(style="text-align: justify;",
@@ -269,8 +277,8 @@ body<- dashboardBody(
                                           span(
                                             `data-toggle` = "tooltip", `data-placement` = "below",
                                             title = "Select the geographical coordinates 
-                                            of the site (in decimal degrees). Note that data will be extracted only for locations in
-                                            European continental surface area.",
+                                            of the site (in decimal degrees). Note that only locations in
+                                            European continental surface area will work.",
                                             icon("info-circle")
                                           )
                                    )
@@ -306,12 +314,22 @@ body<- dashboardBody(
                                             icon("info-circle")
                                           )
                                    )
+                                 ),
+                                 fluidRow(
+                                   column(8,""),
+                                   column(2,
+                                          div(
+                                            actionButton("nextButton1", h4("Next")),
+                                            stile="float: right;"  # Align content to the right
+                                          )#div
+                                   )
                                  )
                         ),
                         ############################################################################################
                         ########################## TAB PANEL FOR SOIL DATA  ########################################
                         ############################################################################################   
-                        tabPanel(h4("Soil data"),
+                        tabPanel(value="soildatapanel",
+                                 title=h4("Soil data"),
                                  fluidRow(
                                    column(10,
                                           h4(style="text-align: justify;","Provide details about the soil variables.
@@ -409,13 +427,23 @@ body<- dashboardBody(
                                             which refers to 0-20 cm depth.",
                                             icon("info-circle")
                                           ))
+                                 ),
+                                 fluidRow(
+                                   column(8,""),
+                                   column(2,
+                                          div(
+                                            actionButton("nextButton2", h4("Next")),
+                                            stile="float: right;"  # Align content to the right
+                                          )#div
+                                   )
                                  )
                         )
                         ,
                         ############################################################################################
                         ########################## TAB PANEL FOR LITTER INPUT DATA #################################
                         ############################################################################################   
-                        tabPanel(h4("Litter input data"), 
+                        tabPanel(value="litterdatapanel",
+                                 title=h4("Litter input data"), 
                                  fluidRow(
                                    column(10,
                                           h4(style="text-align: justify;",
@@ -520,7 +548,7 @@ body<- dashboardBody(
                                                    title = "Lignin to nitrogen ratio of the litter input. If no data is available, 
                                                    a species-specific value is calculated as the product of the carbon to nitrogen ratio
                                                    and the lignin to carbon ratio, where the carbon to nitrogen ratio of the litter input
-                                                   is derived from the TRY database for each species, the lignin content is considered equal to the neither soluble nor hydrolisable compound fraction of the litter input, and the percentage of carbon in the litter input
+                                                   is derived from the TRY database for each species, and the percentage of carbon in the litter input
                                                    is considered as 48.2% for all species (Ma et al., 2018).",
                                                    icon("info-circle")
                                                  ))
@@ -543,17 +571,27 @@ body<- dashboardBody(
                                           column(1,
                                                  span(
                                                    `data-toggle` = "tooltip", `data-placement` = "below",
-                                                   title = "Diameter of the woody litter input (cm). If no data is available, 
+                                                   title = "Woody litter size of the litter input (cm). If no data is available, 
                                                    a default value of 2 cm will be used (Tuomi et al., 2009).",
                                                    icon("info-circle")
                                                  ))
+                                 ),
+                                 fluidRow(
+                                   column(8,""),
+                                   column(2,
+                                          div(
+                                            actionButton("nextButton3", h4("Next")),
+                                            stile="float: right;"  # Align content to the right
+                                          )#div
+                                   )
                                  )
                         )   
                         ,
                         ############################################################################################
                         ########################## TAB PANEL FOR CLIMATE DATA  #####################################
                         ############################################################################################   
-                        tabPanel(h4("Climate data"),
+                        tabPanel(value="climatedatapanel",
+                                 title=h4("Climate data"),
                                  fluidRow(
                                    column(10,
                                           h4(style="text-align: justify;",
@@ -682,6 +720,15 @@ body<- dashboardBody(
                                             the 1983 and 2023 average are used, respectively.",
                                             icon("info-circle")
                                           ))
+                                 ),
+                                 fluidRow(
+                                   column(8,""),
+                                   column(2,
+                                          div(
+                                            actionButton("nextButton4", h4("Next")),
+                                            stile="float: right;"  # Align content to the right
+                                          )#div
+                                   )
                                  )
                                  
                         )#TabPanel
@@ -689,12 +736,13 @@ body<- dashboardBody(
                         ############################################################################################
                         ########################## TAB PANEL FOR LAND MANAGEMENT DATA ##############################
                         ############################################################################################   
-                        tabPanel(h4("Land management"), 
+                        tabPanel(value="landmanpanel",
+                                 title=h4("Land management"), 
                                  fluidRow(
                                    column(10,
                                           h4(style="text-align: justify;",
                                              "Provide details about the disturbance event, 
-                                             such as fires, thinning, clear-cutting and deseases."))
+                                             such as fires, thinning, clear-cutting and diseases."))
                                  ),
                                  fluidRow(
                                    column(4, 
@@ -760,85 +808,157 @@ body<- dashboardBody(
                                                    for the duration of the simulations.",
                                                    icon("info-circle")
                                                  ))
-                                 )
+                                 ),
+                                 fluidRow(
+                                   column(8,""),
+                                   column(2,
+                                          div(
+                                            actionButton("nextButton5", h4("Go to plots")),
+                                            stile="float: right;"  # Align content to the right
+                                          )#div
+                                   )
+                                 )#FluidRow
+                                 
                         )#TabPanel
             )#TabSetPanel
+            
     )#TabItem
     ,
     #-----------------------------------------------
     #--------Data visualization tab-----------------
     #----------------------------------------------
     tabItem(tabName = "Visualization",
-            tags$style(HTML("th {font-family: sans-serif; font-weight: 500;} 
+            tags$style(HTML("th {font-family: sans-serif; font-weight: 1000;} 
                             td {text-align: center;}")),#Centers table content
             HTML("<h2><span class='bolder-text'>Data visualization</span></h2>"),
-            fluidRow(
-              column(10,
-                     h4("This page shows the pedo-climatic 
+            h4("This page shows the pedo-climatic 
                      conditions of the site selected 
                      in the Data input panel. 
                      Make sure to enter all the data fields.
-                        It takes a while to run due to the large amount of computations."))),
-            br(),
-            fluidRow(
-              #Insert a button to start plotting
-              # column(width = 12, 
-              #        offset = 0,
-              #        #actionButton(inputId = "button", label = "Go!"),
-              #        shinyBS::bsButton(inputId = "button", label = "Go!"),
-              #        br()
-              # ),
-              
-              #---------------------------------------
-              #--------Soil data table-----------------
-              #---------------------------------------
-              column(width = 10, 
-                     offset = 0,
-                     box(width=10,
-                         collapsible = TRUE, # This allows collapsing
-                         collapsed = FALSE, # Initial value
-                         HTML("<h3><span class='bolder-text'>Soil data</span></h3>"),
-                         tableOutput("table_soildata")
-                     )#box
-              ),#column
-              #---------------------------------------
-              #--------Climate graphs-----------------
-              #---------------------------------------
-              column(width = 10, 
-                     offset = 0,
-                     box(width=10,
-                         collapsible = TRUE, # This allows collapsing
-                         collapsed = FALSE, # Initial value
-                         HTML("<h3><span class='bolder-text'>Climate data</span></h3>"),
-                         plotOutput("climate_plots")
-                     )#box
-              ),#column
-              #-----------------------------------------------------------------------------------
-              #--------Histogram Litter input in RCP2.6 and RCP6.0 // fixed and varying----------
-              #----------------------------------------------------------------------------------
-              column(width = 10, 
-                     offset = 0,
-                     box(width=10,
-                         collapsible = TRUE, # This allows collapsing
-                         collapsed = FALSE, # Initial value
-                         HTML("<h3><span class='bolder-text'>Litter data</span></h3>"),
-                         plotOutput("plot_Cin")
-                     )#box
-              ),#column
-              #-----------------------------------------------------------------------------------
-              #--------Plot Litter input in Management scenarios-------------------------------
-              #----------------------------------------------------------------------------------
-              column(width = 10, 
-                     offset = 0,
-                     box(width=10,
-                         collapsible = TRUE, # This allows collapsing
-                         collapsed = FALSE, # Initial value
-                         #HTML("<h3><span class='bolder-text'>Land management</span></h3>"),
-                         plotOutput("plot_Cin_LM")
-                     )#box
-              )#column
-            )#fluidRow
-    ),
+                        It takes a while to run due to the large amount of data processed."),
+            tabsetPanel(id="mainVisualPanel",
+                        type = "tabs",
+                        ############################################################################################
+                        ########################## TAB PANEL SOIL TABLE ######################################
+                        ############################################################################################  
+                        tabPanel(value="soiltablepanel",
+                                 title=h4("Soil characteristics"), 
+                                 fluidRow(
+                                   #Insert a button to start plotting
+                                   # column(width = 12, 
+                                   #        offset = 0,
+                                   #        #actionButton(inputId = "button", label = "Go!"),
+                                   #        shinyBS::bsButton(inputId = "button", label = "Go!"),
+                                   #        br()
+                                   # ),
+                                   
+                                   #---------------------------------------
+                                   #--------Soil data table-----------------
+                                   #---------------------------------------
+                                   column(width = 10, 
+                                          offset = 0,
+                                          box(width=10,
+                                              collapsible = TRUE, # This allows collapsing
+                                              collapsed = FALSE, # Initial value
+                                              HTML("<h3><span class='bolder-text'>Soil data</span></h3>"),
+                                              tableOutput("table_soildata")
+                                          )#box
+                                   ),#column
+                                 )#FulidRow
+                                 ,
+                                 fluidRow(
+                                   column(8,""),
+                                   column(2,
+                                          div(
+                                            actionButton("nextButton6", h4("Next")),
+                                            stile="float: right;"  # Align content to the right
+                                          )#div
+                                   )
+                                 )#FluidRow
+                        ),#TabPanel
+                        tabPanel(value="climplotpanel",
+                                 title=h4("Climate variables"), 
+                                 fluidRow(
+                                   #---------------------------------------
+                                   #--------Climate graphs-----------------
+                                   #---------------------------------------
+                                   column(width = 10, 
+                                          offset = 0,
+                                          box(width=10,
+                                              collapsible = TRUE, # This allows collapsing
+                                              collapsed = FALSE, # Initial value
+                                              HTML("<h3><span class='bolder-text'>Climate data</span></h3>"),
+                                              plotOutput("climate_plots")
+                                          )#box
+                                   ),#column
+                                 )#FluidRow
+                                 ,
+                                 fluidRow(
+                                   column(8,""),
+                                   column(2,
+                                          div(
+                                            actionButton("nextButton7", h4("Next")),
+                                            stile="float: right;"  # Align content to the right
+                                          )#div
+                                   )
+                                 )#FluidRow
+                        ),#TabPanel
+                        tabPanel(value="litterplotpanel",
+                                 title=h4("Litter inputs"), 
+                                 fluidRow(
+                                   #-----------------------------------------------------------------------------------
+                                   #--------Histogram Litter input in RCP2.6 and RCP6.0 // fixed and varying----------
+                                   #----------------------------------------------------------------------------------
+                                   column(width = 10, 
+                                          offset = 0,
+                                          box(width=10,
+                                              collapsible = TRUE, # This allows collapsing
+                                              collapsed = FALSE, # Initial value
+                                              HTML("<h3><span class='bolder-text'>Litter data</span></h3>"),
+                                              plotOutput("plot_Cin")
+                                          )#box
+                                   ),#column
+                                 )#FluidRow
+                                 ,
+                                 fluidRow(
+                                   column(8,""),
+                                   column(2,
+                                          div(
+                                            actionButton("nextButton8", h4("Next")),
+                                            stile="float: right;"  # Align content to the right
+                                          )#div
+                                   )
+                                 )#FluidRow
+                        ),#TabPanel
+                        tabPanel(value="landmanplotpanel",
+                                 title=h4("Land management"), 
+                                 fluidRow(
+                                   #-----------------------------------------------------------------------------------
+                                   #--------Plot Litter input in Management scenarios-------------------------------
+                                   #----------------------------------------------------------------------------------
+                                   column(width = 10, 
+                                          offset = 0,
+                                          box(width=10,
+                                              collapsible = TRUE, # This allows collapsing
+                                              collapsed = FALSE, # Initial value
+                                              HTML("<h3><span class='bolder-text'>Land management</span></h3>"),
+                                              plotOutput("plot_Cin_LM")
+                                          )#box
+                                   )#column
+                                 )#fluidRow
+                                 ,
+                                 fluidRow(
+                                   column(7,""),
+                                   column(3,
+                                          div(
+                                            actionButton("nextButton9", h4("Run the simulations")),
+                                            stile="float: right;"  # Align content to the right
+                                          )#div
+                                   )
+                                 )#FluidRow
+                        )#TabPanel
+            )#Tabsetpanel
+    ), #TabItem
     
     #------------------------------------------------------------
     #--------Plots SIMULATIONS-----------------------------------
@@ -853,12 +973,14 @@ body<- dashboardBody(
             and land management scenarios (with or without disturbance).
                  It takes a while to run because multiple soil models are launched.</h4>"),
             br(),
-
-            tabsetPanel(type = "tabs",
+            
+            tabsetPanel(id="mainSimulationsPanel",
+                        type = "tabs",
                         #------------------------------------------------------------
                         #--------Simulations with fixed land-use---------------------
                         #------------------------------------------------------------
-                        tabPanel(h4("Fixed land-use"),
+                        tabPanel(value="simufixedLUpanel",
+                                 title= h4("Fixed land-use"),
                                  fluidRow( 
                                    column(10,HTML("<h4 style='text-align: left;'> 
                                                Move the slider to see the effect of clay on 
@@ -866,23 +988,45 @@ body<- dashboardBody(
                                    uiOutput("clay_slider"),
                                    box(width=10,
                                        #plotlyOutput("simulations_fixedLU"))#box
-                                       plotOutput("simulations_fixedLU"))#box
-                                 )),
+                                       plotOutput("simulations_fixedLU", height = "700px"))#box
+                                 ),#FluidRow
+                                 fluidRow(
+                                   column(7,""),
+                                   column(3,
+                                          div(
+                                            actionButton("nextButton10", h4("Next")),
+                                            stile="float: right;"  # Align content to the right
+                                          )#div
+                                   )
+                                 )#FluidRow
+                        ),
                         #------------------------------------------------------------
                         #--------Simulations with land-use change---------------------
                         #------------------------------------------------------------
-                        tabPanel(h4("Land-use change"),
+                        tabPanel(value="simuvarLUpanel",
+                                 title= h4("Land-use change"),
                                  fluidRow(
                                    column(10,HTML("<h4 style='text-align: left;'> 
                                                Move the slider to see the effect of clay on 
                                       SOC stocks and CO<sub>2</sub> fluxes</h4>")),
                                    uiOutput("clay_slider2"),
-                                   box(width=10,plotOutput("simulations_LUchange"))
-                                 )),
+                                   box(width=10,plotOutput("simulations_LUchange", height = "700px"))
+                                 ),#FluidRow
+                                 fluidRow(
+                                   column(7,""),
+                                   column(3,
+                                          div(
+                                            actionButton("nextButton11", h4("Next")),
+                                            stile="float: right;"  # Align content to the right
+                                          )#div
+                                   )
+                                 )#FluidRow
+                        ),
                         #------------------------------------------------------------
                         #--------Simulations land management change------------------
                         #------------------------------------------------------------
-                        tabPanel(h4("Land management"),
+                        tabPanel(value="simuLMpanel",
+                                 title= h4("Land management"),
                                  fluidRow(
                                    column(10,HTML("<h4 style='text-align: left;'> 
                                                Move the sliders to see how changing the mortality 
@@ -890,8 +1034,18 @@ body<- dashboardBody(
                                    #column(4,uiOutput("clay_slider3")),
                                    column(5,uiOutput("MR_slider")),
                                    column(5,uiOutput("HR_slider")),
-                                   box(width=10,plotOutput("plot_land_management"))
-                                 ))
+                                   box(width=10,plotOutput("plot_land_management", height = "700px"))
+                                 ),#FluidRow
+                                 fluidRow(
+                                   column(7,""),
+                                   column(3,
+                                          div(
+                                            actionButton("nextButton12", h4("Go to downloads")),
+                                            stile="float: right;"  # Align content to the right
+                                          )#div
+                                   )
+                                 )#FluidRow
+                        )
             )#tabsetpanel
     ),#tabItem
     #----------------------------------------
@@ -1012,7 +1166,7 @@ body<- dashboardBody(
                   icon("youtube", style = "margin-right: 5px; font-size: 1.5em;"),
                   HTML("<h4><span class='bolder-text'> Tutorial</span></h4>")
                 ),
-                tags$video(src='webtool_tutorial_v1.mp4', type="video/mp4", 
+                tags$video(src='webtool_tutorial_v1.mp4', type="video/mp4",
                            width=2846/5, height=1684/5, controls="controls")
               )),
               column(5,
@@ -1021,7 +1175,7 @@ body<- dashboardBody(
                          style = "display: flex; align-items: center; font-size: 1.5em;",
                          icon("book", style = "margin-right: 5px;"),
                          HTML("<h4><span class='bolder-text'>Documentation</span></h4>")
-                       ), 
+                       ),
                        uiOutput("Download_documentation3")
                      )
               ),
@@ -1032,18 +1186,30 @@ body<- dashboardBody(
                   HTML("<h4><span class='bolder-text'> GitHub Code</span></h4>")
                 ),
                 uiOutput("githubcode")
-              )),
-              column(10,
+              ))
+	      ),
+	    fluidRow(h4(" ")),
+	    fluidRow(
+              column(5,
                      tagList(
                        div(
                          style = "display: flex; align-items: center; font-size: 1.5em;",
                          icon("envelope", style = "margin-right: 5px;"),
                          HTML("<h4><span class='bolder-text'>Contact</span></h4>")
-                       ), 
-                       h4("bruni@geologie.ens.fr")
+                       ),
+                       h4("ebruni93@gmail.com")
                      )
               ),
-              
+              column(5,
+                     tagList(
+                       div(
+                         style = "display: flex; align-items: center; font-size: 1.5em;",
+                         icon("certificate", style = "margin-right: 5px;"),
+                         HTML("<h4><span class='bolder-text'>Licence</span></h4>")
+                       ),
+                       uiOutput("licence_me4soc")
+                       )
+              ),
             ),
             fluidRow(h4(" ")),
             fluidRow(
@@ -1085,11 +1251,12 @@ body<- dashboardBody(
               column(12,br()),
               column(10,uiOutput("tabLUCAS.4"))
             )
-            
-            
-            
-            
+
+
+
+
     )
+
   )
 )
 
@@ -1110,13 +1277,29 @@ sidebar<-dashboardSidebar(
 #----------------------------------------
 #--------ui-----------------------------
 #----------------------------------------
-
+#This moves you to the website landing page when you click on the Dashboard title
 ui <- dashboardPage(
-  dashboardHeader(title = "Multi-model ensemble"),
+  dashboardHeader(title = "me4soc",  # browser tab title
+		  tags$li(class = "dropdown",
+			  tags$a(
+				 href = "http://me4soc.geologie.ens.fr/",
+				 "Home",
+				 style = "color: black; text-decoration: none;"
+			  )
+		  )
+		  ),
   sidebar,
   body,
   skin="yellow"
 )
+
+#This is without landing page
+#ui <- dashboardPage(
+#  dashboardHeader(title = "me4soc"),
+#  sidebar,
+#  body,
+#  skin="yellow"
+#)
 
 #--------------------------#--------------------------#--------------------------#--------------------------
 #------server--------#--------------------------#--------------------------#--------------------------
@@ -1127,6 +1310,7 @@ server <- function(input, output,session) {
   #https://fontawesome.com/icons
   output$menu <- renderMenu({
     sidebarMenu(
+      id = "tabsSide",
       menuItem("Description", tabName = "Models", icon = icon("house"),
                menuSubItem("Project",tabName = "Project",icon = icon('circle-info')),
                menuSubItem("Models",tabName = "Models_description",icon = icon('folder-tree')),
@@ -1194,7 +1378,7 @@ server <- function(input, output,session) {
     # Check if the lon-lat pair exists in the dataframe
     if (any(distance_lat<=distance_threshold & distance_lon<=distance_threshold)) {
       output$errorMessage <- renderText({
-        "Select a location on the terrestrial surface. If your chosen point is along the coast, try moving it more inland."
+        "The selected location might be on or close to a water surface. Check that all the data has been correctly extracted, or modify the geographical coordinates."
       })
     } else {
       output$errorMessage <- renderText({
@@ -1202,7 +1386,7 @@ server <- function(input, output,session) {
       })
     }
   }
-  ###########
+  ##########
   
   #------------------------------------------------------
   #------draw map-------------------------------------
@@ -1246,7 +1430,7 @@ server <- function(input, output,session) {
               value="2020-01-01",min="2020-01-01",max="2099-01-01",startview="decade")
   })
   
-
+  
   #----------------------------------------
   #Retrieve values of reactive simulation length and geographic coordinates
   #They can be called like simulation_length() after
@@ -1261,6 +1445,7 @@ server <- function(input, output,session) {
   dates_in<-reactive(
     input$dates)
   
+  
   ########################################################################
   ############ REACTIVE OUTPUT FOR SOIL DATA ############################
   ########################################################################
@@ -1270,33 +1455,40 @@ server <- function(input, output,session) {
   #--------clay----------------------------
   #----------------------------------------
   output$clay <- renderUI({
+    # Create 0-row data frame which will be used to store data
+    dat <- data.frame(x = numeric(0), y = numeric(0))
+    ######################################################################################################
+    withProgress(message = 'Processing clay', value = 0, {
+      # Number of times we'll go through the loop
+      n_progr<-2
+      i_progr<-1
+      
+      # Each time through the loop, add another row of data. This is
+      # a stand-in for a long-running computation.
+      dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+      # Increment the progress bar, and update the detail text.
+      incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+      
+      
+    clay_file<-nc_open("data/SOIL/Clay_WGS84.nc")
+    #clay_file<-nc_open(paste0(temp_file,"/Clay_WGS84.nc"))
+    #Read lon-lat variables
+    lon_clay <- ncvar_get(clay_file, varid = "lon")
+    lat_clay <- ncvar_get(clay_file, varid = "lat")
+    #Retrieve variable
+    clay_data <- ncvar_get(clay_file, "Band1")
     lon_index_clay <- which.min(abs(lon_clay - coordsLON()))
     lat_index_clay <- which.min(abs(lat_clay - coordsLAT()))
     clay_site = as.numeric(clay_data[lon_index_clay, lat_index_clay])
+    rm(clay_file,lon_clay,lat_clay,clay_data)
     
-    # #Select the closest lon-lat
-    # sort_clay_lon <- sort(abs(lon_clay - coordsLON()))
-    # sort_clay_lat <- sort(abs(lat_clay - coordsLAT()))
-    # 
-    # lon_index_clay<-which(abs(lon_clay - coordsLON())==sort_clay_lon[1])
-    # lat_index_clay<-which(abs(lat_clay - coordsLAT())==sort_clay_lat[1])
-    # 
-    # clay_site = as.numeric(clay_data[ lon_index_clay, lat_index_clay])
-    # print("Before")
-    # print(clay_site)
-    # 
-    # #If the variable is NA, select the second closest lon-lat,..., as long as lat and lon distance <0.5(lat and lon)
-    # for(i in 1:100){
-    #   if(is.na(clay_site) & sort_clay_lon[i] <0.5 & sort_clay_lat[i]<0.5){
-    #     lon_index_clay <- which(abs(lon_clay - coordsLON())==sort_clay_lon[i+1])
-    #     lat_index_clay <- which(abs(lat_clay - coordsLAT())==sort_clay_lat[i+1])
-    #     clay_site = as.numeric(clay_data[lon_index_clay, lat_index_clay])
-    #   }else{
-    #     break
-    #   }
-    # }
-    # print("After loop")
-    # print(clay_site)
+    # Each time through the loop, add another row of data. This is
+    # a stand-in for a long-running computation.
+    dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+    i_progr<-i_progr+1
+    # Increment the progress bar, and update the detail text.
+    incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+    })
     
     #If variable is still NA, consider it too far
     numericInput(inputId = "clay", label = h4(style="text-align: left;","Clay (%)"),value=round(clay_site,2),min=0,max=100)
@@ -1306,10 +1498,42 @@ server <- function(input, output,session) {
   #--------silt----------------------------
   #----------------------------------------
   output$silt <- renderUI({
-    #silt_site<-as.numeric(soil_data %>% filter(round(GPS_LAT,1)==round(coordsLAT(),1),round(GPS_LONG,1)==round(input$coordsLON,1)) %>%select(silt))
+    # Create 0-row data frame which will be used to store data
+    dat <- data.frame(x = numeric(0), y = numeric(0))
+    ######################################################################################################
+    withProgress(message = 'Processing silt', value = 0, {
+      # Number of times we'll go through the loop
+      n_progr<-2
+      i_progr<-1
+      
+      # Each time through the loop, add another row of data. This is
+      # a stand-in for a long-running computation.
+      dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+      # Increment the progress bar, and update the detail text.
+      incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+      
+    silt_file<-nc_open("data/SOIL/Silt_WGS84.nc")
+    #silt_file<-nc_open(paste0(temp_file,"/Silt_WGS84.nc"))
+    #Read lon-lat variables
+    lon_silt <- ncvar_get(silt_file, varid = "lon")
+    lat_silt <- ncvar_get(silt_file, varid = "lat")
+    #Retrieve variable
+    silt_data <- ncvar_get(silt_file, "Band1")
+    
     lon_index_silt <- which.min(abs(lon_silt - coordsLON()))
     lat_index_silt <- which.min(abs(lat_silt - coordsLAT()))
+    
     silt_site = as.numeric(silt_data[lon_index_silt, lat_index_silt])
+    rm(silt_file,lon_silt,lat_silt,silt_data)
+    
+    # Each time through the loop, add another row of data. This is
+    # a stand-in for a long-running computation.
+    dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+    i_progr<-i_progr+1
+    # Increment the progress bar, and update the detail text.
+    incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+    })
+    
     numericInput(inputId = "silt", label = h4(style="text-align: left;","Silt (%)"),value=round(silt_site,2),min=0,max=100)
     
   })
@@ -1355,10 +1579,39 @@ server <- function(input, output,session) {
   #----------------------------------------
   
   output$SOC <- renderUI({
-    
+    # Create 0-row data frame which will be used to store data
+    dat <- data.frame(x = numeric(0), y = numeric(0))
+    ######################################################################################################
+    withProgress(message = 'Processing SOC', value = 0, {
+      # Number of times we'll go through the loop
+      n_progr<-2
+      i_progr<-1
+      
+      # Each time through the loop, add another row of data. This is
+      # a stand-in for a long-running computation.
+      dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+      # Increment the progress bar, and update the detail text.
+      incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+    #####
+    SOC_file<-nc_open("data/SOIL/socstockseu26_WGS84.nc")
+    #SOC_file<-nc_open(paste0(temp_file,"/socstockseu26_WGS84.nc"))
+    #Read lon-lat variables
+    lon_SOC <- ncvar_get(SOC_file, varid = "lon")
+    lat_SOC <- ncvar_get(SOC_file, varid = "lat")
+    #Retrieve variable
+    SOC_data <- ncvar_get(SOC_file, "Band1")
     lon_index_SOC <- which.min(abs(lon_SOC - coordsLON()))
     lat_index_SOC <- which.min(abs(lat_SOC - coordsLAT()))
     SOC_site = as.numeric(SOC_data[lon_index_SOC, lat_index_SOC])
+    rm(SOC_file,lon_SOC,lat_SOC,SOC_data)
+    
+    # Each time through the loop, add another row of data. This is
+    # a stand-in for a long-running computation.
+    dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+    i_progr<-i_progr+1
+    # Increment the progress bar, and update the detail text.
+    incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+    })
     
     numericInput(inputId = "SOC", label = HTML("<h4 style='text-align: left;'> 
                                                Initial SOC stock (MgC ha<sup>-1</sup>) </h4>"),value=round(SOC_site,2))
@@ -1373,9 +1626,41 @@ server <- function(input, output,session) {
   #--------CN ratio----------------------------
   #----------------------------------------
   output$CNratio <- renderUI({
+    
+    # Create 0-row data frame which will be used to store data
+    dat <- data.frame(x = numeric(0), y = numeric(0))
+    ######################################################################################################
+    withProgress(message = 'Processing C:N', value = 0, {
+      # Number of times we'll go through the loop
+      n_progr<-2
+      i_progr<-1
+      
+      # Each time through the loop, add another row of data. This is
+      # a stand-in for a long-running computation.
+      dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+      # Increment the progress bar, and update the detail text.
+      incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+      
+    CN_file<-nc_open("data/SOIL/CN_WGS84.nc")
+    #CN_file<-nc_open(paste0(temp_file,"/CN_WGS84.nc"))
+    #Read lon-lat variables
+    lon_CN <- ncvar_get(CN_file, varid = "lon")
+    lat_CN <- ncvar_get(CN_file, varid = "lat")
+    #Retrieve variable
+    CN_data <- ncvar_get(CN_file, "Band1")
     lon_index_CN <- which.min(abs(lon_CN - coordsLON()))
     lat_index_CN <- which.min(abs(lat_CN - coordsLAT()))
     CN_site = as.numeric(CN_data[lon_index_CN, lat_index_CN])  
+    rm(CN_file,lon_CN,lat_CN,CN_data)
+    
+    # Each time through the loop, add another row of data. This is
+    # a stand-in for a long-running computation.
+    dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+    i_progr<-i_progr+1
+    # Increment the progress bar, and update the detail text.
+    incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+  })
+  
     numericInput(inputId = "CNratio", label = h4(style="text-align: left;","C:N ratio"),value=round(CN_site,2))
   })
   
@@ -1388,9 +1673,41 @@ server <- function(input, output,session) {
   #--------Bulk density----------------------------
   #----------------------------------------
   output$bulkdensity <- renderUI({
+    
+    # Create 0-row data frame which will be used to store data
+    dat <- data.frame(x = numeric(0), y = numeric(0))
+    ######################################################################################################
+    withProgress(message = 'Processing bulk density', value = 0, {
+      # Number of times we'll go through the loop
+      n_progr<-2
+      i_progr<-1
+      
+      # Each time through the loop, add another row of data. This is
+      # a stand-in for a long-running computation.
+      dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+      # Increment the progress bar, and update the detail text.
+      incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+      
+    BD_file<-nc_open("data/SOIL/Bulk_density_WGS84.nc")
+    #BD_file<-nc_open(paste0(temp_file,"/Bulk_density_WGS84.nc"))
+    #Read lon-lat variables
+    lon_BD <- ncvar_get(BD_file, varid = "lon")
+    lat_BD <- ncvar_get(BD_file, varid = "lat")
+    #Retrieve variable
+    BD_data <- ncvar_get(BD_file, "Band1")
     lon_index_BD <- which.min(abs(lon_BD - coordsLON()))
     lat_index_BD <- which.min(abs(lat_BD - coordsLAT()))
     BD_site<-as.numeric(BD_data[lon_index_BD, lat_index_BD])
+    rm(BD_file,lon_BD,lat_BD,BD_data)
+    
+    # Each time through the loop, add another row of data. This is
+    # a stand-in for a long-running computation.
+    dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+    i_progr<-i_progr+1
+    # Increment the progress bar, and update the detail text.
+    incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+    })
+    
     numericInput(inputId = "bulkdensity", label = HTML("<h4 style='text-align: left;'> 
                                                Bulk density (Mg m<sup>-3</sup>) </h4>"),value=round(BD_site,2))
   })
@@ -1593,7 +1910,7 @@ server <- function(input, output,session) {
   file_Cinput_bg_uploaded <- reactive({
     !is.null(input$upload_Cinput_bg)
   })
-
+  
   #----------------------------------------------------------------------------------
   #--------Function to retrieve the ag C input from either user or ISIMIP data-------------
   #----------------------------------------------------------------------------------
@@ -1613,7 +1930,7 @@ server <- function(input, output,session) {
       #req(file)
       #validate(need(ext == "csv", "Please upload a csv file"))
       if (ext=="csv"){
-        read.csv(file$datapath, header = FALSE)[1:simulation_length()]
+        read.csv(file$datapath, header = FALSE)$V1[1:simulation_length()]
       } else if (ext=="txt"){
         read.table(file$datapath,sep=",", header = FALSE)$V1[1:simulation_length()]
       }else(warning("The file should be in a csv or txt format"))
@@ -1625,8 +1942,32 @@ server <- function(input, output,session) {
       print("The user has NOT input AG C input TIME SERIES data, so we're using ISIMIP")
       print("####################################################")
       print("####################################################")
+      # #####
+      # #RCP26
+      # #####
       
-      retreive_Cinput(lon_litter_rcp26,lat_litter_rcp26,litter_time_rcp26,litter_rcp26_ag)
+      litter_file_rcp26<-nc_open("data/LITTER/npp_average_rcp26_EU_annual_2006_2099_fixed.nc4")
+      #litter_file_rcp26<-nc_open(paste0(temp_file,"/npp_average_rcp26_EU_annual_2006_2099_fixed.nc4"))
+      #----------------------------------------------------
+      #Read lon-lat-time variables
+      lon_litter_rcp26 <- ncvar_get(litter_file_rcp26, varid = "lon")
+      lat_litter_rcp26 <- ncvar_get(litter_file_rcp26, varid = "lat")
+      #Convert time to dates
+      litter_time_rcp26 <- as.Date("1661-1-1") %m+% years(litter_file_rcp26$dim$time$vals)
+      
+      #Retrieve variable for whole time length
+      litter_rcp26_npp <- ncvar_get(litter_file_rcp26, "npp") #kg/m2/sec
+      
+      #convert npp (#kg/m2/sec) to foliar Litterfall carbon with constant coefficient (see Neumann et al., 2018 and Malhi et al., 2011)
+      litter_rcp26_ag <- litter_rcp26_npp*0.34
+      #calculate belowground carbon input with equation from Jonard et al., 2007 fineroot_in (g/m2/yr) =0.333*(1.92*AG_litterfall(g/m2/yr)+130)
+      #where *1000*(60*60*24*365.25) is the conversion factor from kg/m2/sec to (g/m2/yr)
+      litter_rcp26_bg <- 0.333*(1.92*(litter_rcp26_ag*1000*(60*60*24*365.25))+130)/(1000*(60*60*24*365.25)) 
+      
+      CIN = retreive_Cinput(lon_litter_rcp26,lat_litter_rcp26,litter_time_rcp26,litter_rcp26_ag)
+      
+      rm(litter_file_rcp26,lon_litter_rcp26,lat_litter_rcp26,litter_time_rcp26,litter_rcp26_ag,litter_rcp26_npp)
+      return(CIN)
     }
     
   })
@@ -1650,7 +1991,7 @@ server <- function(input, output,session) {
       #req(file)
       #validate(need(ext == "csv", "Please upload a csv file"))
       if (ext=="csv"){
-        read.csv(file$datapath, header = FALSE)[1:simulation_length()]
+        read.csv(file$datapath, header = FALSE)$V1[1:simulation_length()]
       } else if (ext=="txt"){
         print("bg C input")
         print(read.table(file$datapath,sep=",", header = FALSE)$V1[1:simulation_length()])
@@ -1663,7 +2004,33 @@ server <- function(input, output,session) {
       print("The user has NOT input BG C input TIME SERIES data, so we're using ISIMIP")
       print("####################################################")
       print("####################################################")
-      retreive_Cinput(lon_litter_rcp26,lat_litter_rcp26,litter_time_rcp26,litter_rcp26_bg) 
+      # #####
+      # #RCP26
+      # #####
+      
+      litter_file_rcp26<-nc_open("data/LITTER/npp_average_rcp26_EU_annual_2006_2099_fixed.nc4")
+      #litter_file_rcp26<-nc_open(paste0(temp_file,"/npp_average_rcp26_EU_annual_2006_2099_fixed.nc4"))
+      #----------------------------------------------------
+      #Read lon-lat-time variables
+      lon_litter_rcp26 <- ncvar_get(litter_file_rcp26, varid = "lon")
+      lat_litter_rcp26 <- ncvar_get(litter_file_rcp26, varid = "lat")
+      #Convert time to dates
+      litter_time_rcp26 <- as.Date("1661-1-1") %m+% years(litter_file_rcp26$dim$time$vals)
+      
+      #Retrieve variable for whole time length
+      litter_rcp26_npp <- ncvar_get(litter_file_rcp26, "npp") #kg/m2/sec
+      
+      #convert npp (#kg/m2/sec) to foliar Litterfall carbon with constant coefficient (see Neumann et al., 2018 and Malhi et al., 2011)
+      litter_rcp26_ag <- litter_rcp26_npp*0.34
+      #calculate belowground carbon input with equation from Jonard et al., 2007 fineroot_in (g/m2/yr) =0.333*(1.92*AG_litterfall(g/m2/yr)+130)
+      #where *1000*(60*60*24*365.25) is the conversion factor from kg/m2/sec to (g/m2/yr)
+      litter_rcp26_bg <- 0.333*(1.92*(litter_rcp26_ag*1000*(60*60*24*365.25))+130)/(1000*(60*60*24*365.25)) 
+      # #calculate total litter input (kg/m2/sec)
+      # litter_rcp26<- litter_rcp26_ag+litter_rcp26_bg
+      
+      CIN = retreive_Cinput(lon_litter_rcp26,lat_litter_rcp26,litter_time_rcp26,litter_rcp26_bg) 
+      rm(litter_file_rcp26,lon_litter_rcp26,lat_litter_rcp26,litter_time_rcp26,litter_rcp26_bg,litter_rcp26_npp)
+      return(CIN)
     }
     
     # file <- input$upload_Cinput_bg
@@ -1753,8 +2120,27 @@ server <- function(input, output,session) {
   #-----------------------------------------------------------
   output$AG_biomass <- renderUI({
     req(input$year_disturbance)
+    #####
+    #RCP26
+    #####
+    veg_clitter_file_rcp26<-nc_open("data/LITTER/cveg_average_rcp26_EU_annual_2006_2099.nc4") #kg/m2
+    #veg_clitter_file_rcp26<-nc_open(paste0(temp_file,"/cveg_average_rcp26_EU_annual_2006_2099.nc4")) #kg/m2
+    #----------------------------------------------------
+    #Read lon-lat-time variables
+    lon_veg_clitter_rcp26 <- ncvar_get(veg_clitter_file_rcp26, varid = "lon")
+    lat_veg_clitter_rcp26 <- ncvar_get(veg_clitter_file_rcp26, varid = "lat")
+    #Convert time to dates
+    veg_clitter_time_rcp26 <- as.Date("1661-1-1") %m+% years(veg_clitter_file_rcp26$dim$time$vals)
+    #Convert time to dates
+    #veg_clitter_time_plot_rcp26 <- as.Date.character(format(veg_clitter_time_rcp26, "%Y-%m-%d"))
+    #Retrieve variable for whole time length
+    veg_clitter_rcp26 <- ncvar_get(veg_clitter_file_rcp26, "cveg")
+    
     AG_biomass_initial_value = retreive_Cbiomass(lon_veg_clitter_rcp26,lat_veg_clitter_rcp26,veg_clitter_time_rcp26,veg_clitter_rcp26,input$year_disturbance)
     AG_biomass_initial_value=as.numeric(AG_biomass_initial_value)
+    
+    rm(veg_clitter_file_rcp26,lon_veg_clitter_rcp26,lat_veg_clitter_rcp26,veg_clitter_time_rcp26,veg_clitter_rcp26)
+    
     numericInput(inputId = "AG_biomass", label = HTML("<h4 style='text-align: left;'> 
                                                Aboveground biomass (MgC ha<sup>-1</sup> yr<sup>-1</sup>) </h4>"),value=round(AG_biomass_initial_value,2))
   })
@@ -1778,7 +2164,7 @@ server <- function(input, output,session) {
   #--------Function to calculate C input from mortality event-------------
   #-----------------------------------------------------------
   calculate_Cin_mortality_event<-function(Cinput_ag,Cinput_bg,Cbiomass_cveg_ag,Cbiomass_cveg_bg,mortality_index, harvest_index){
-
+    
     #===MORTALITY EVENT====
     #print("Retrieving C input for disturbance scenario")
     ###Supposing mortality event at year 1
@@ -1821,7 +2207,7 @@ server <- function(input, output,session) {
       Cinput_disturbance_ag[c(mort_year:length(Cinput_disturbance_ag))] = retreive_Cinput_ag_rcp26_fix_NOTDIED
       #Add additional AG biomass at year of disturbance
       Cinput_disturbance_ag[mort_year] = Cinput_disturbance_ag[mort_year]+Cbiomass_rcp26_ag_KEPT
-
+      
       #BGinTOT (time series)
       Cinput_disturbance_bg = Cinput_bg
       
@@ -1829,7 +2215,7 @@ server <- function(input, output,session) {
       Cinput_disturbance_bg[c(mort_year:length(Cinput_disturbance_bg))] =  retreive_Cinput_bg_rcp26_fix_NOTDIED
       #Add additional BG biomass at year of disturbance
       Cinput_disturbance_bg[mort_year] = Cinput_disturbance_bg[mort_year]+Cbiomass_rcp26_bg_DIED
-
+      
     }else{
       #AGinTOT (time series)
       Cinput_disturbance_ag = Cinput_ag
@@ -1912,7 +2298,7 @@ server <- function(input, output,session) {
       print("####################################################")
       
       values$set_temp_user_data <- FALSE
-      retreive_clim_data_site()[[8]]
+      retreive_clim_data_site_temp()[[2]]
     }
     
   })
@@ -1960,7 +2346,7 @@ server <- function(input, output,session) {
       print("####################################################")
       
       values$set_prec_user_data <- FALSE
-      retreive_clim_data_site()[[5]]
+      retreive_clim_data_site_precip()[[2]]
     }
     
   })
@@ -2006,7 +2392,7 @@ server <- function(input, output,session) {
       print("####################################################")
       
       values$set_potevap_user_data <- FALSE
-      retreive_clim_data_site()[[2]]
+      retreive_clim_data_site_potevap()[[2]]
     }
     
   })
@@ -2052,7 +2438,7 @@ server <- function(input, output,session) {
       print("####################################################")
       
       values$set_vswc_user_data <- FALSE
-      retreive_clim_data_site()[[11]]
+      retreive_clim_data_site_vswc()[[2]]
     }
     
   })
@@ -2088,8 +2474,8 @@ server <- function(input, output,session) {
       print("The user has NOT input potevap data, so we're using ISIMIP")
       print("####################################################")
       print("####################################################")
-      #print(retreive_clim_data_site()[[1]])
-      retreive_clim_data_site()[[1]]
+      #print(retreive_clim_data_site_potevap()[[1]])
+      retreive_clim_data_site_potevap()[[1]]
     }
     
   })
@@ -2124,7 +2510,7 @@ server <- function(input, output,session) {
       print("####################################################")
       print("####################################################")
       
-      retreive_clim_data_site()[[4]]
+      retreive_clim_data_site_precip()[[1]]
     }
     
   })
@@ -2160,7 +2546,7 @@ server <- function(input, output,session) {
       print("####################################################")
       print("####################################################")
       
-      retreive_clim_data_site()[[7]]
+      retreive_clim_data_site_temp()[[1]]
     }
     
   })
@@ -2196,7 +2582,7 @@ server <- function(input, output,session) {
       print("####################################################")
       print("####################################################")
       
-      retreive_clim_data_site()[[10]]
+      retreive_clim_data_site_vswc()[[1]]
     }
     
   })
@@ -2231,6 +2617,73 @@ server <- function(input, output,session) {
     }
   })
   
+  
+  ##############  ##############  ##############  ##################
+  ## ADD Next buttons to navigate from one Tabset panel to the other
+  ##############  ##############  ##############  ##################
+  
+  observeEvent(input$nextButton1, {
+    # Switch to Second Tab using its id
+    updateTabsetPanel(session, inputId = "mainDataPanel", selected = "soildatapanel")
+  })
+  
+  observeEvent(input$nextButton2, {
+    # Switch to Second Tab using its id
+    updateTabsetPanel(session, inputId = "mainDataPanel", selected = "litterdatapanel")
+  })
+  
+  observeEvent(input$nextButton3, {
+    # Switch to Second Tab using its id
+    updateTabsetPanel(session, inputId = "mainDataPanel", selected = "climatedatapanel")
+  })
+  
+  observeEvent(input$nextButton4, {
+    # Switch to Second Tab using its id
+    updateTabsetPanel(session, inputId = "mainDataPanel", selected = "landmanpanel")
+  })
+  
+  
+  
+  observeEvent(input$nextButton5, {
+    updateTabItems(session, "tabsSide", "Visualization")
+  })
+  
+  
+  
+  observeEvent(input$nextButton6, {
+    # Switch to Second Tab using its id
+    updateTabsetPanel(session, inputId = "mainVisualPanel", selected = "climplotpanel")
+  })
+  
+  observeEvent(input$nextButton7, {
+    # Switch to Second Tab using its id
+    updateTabsetPanel(session, inputId = "mainVisualPanel", selected = "litterplotpanel")
+  })
+  
+  observeEvent(input$nextButton8, {
+    # Switch to Second Tab using its id
+    updateTabsetPanel(session, inputId = "mainVisualPanel", selected = "landmanplotpanel")
+  })
+  
+  
+  observeEvent(input$nextButton9, {
+    updateTabItems(session, "tabsSide", "Plots_simulations")
+  })
+  
+  observeEvent(input$nextButton10, {
+    # Switch to Second Tab using its id
+    updateTabsetPanel(session, inputId = "mainSimulationsPanel", selected = "simuvarLUpanel")
+  })
+  
+  observeEvent(input$nextButton11, {
+    # Switch to Second Tab using its id
+    updateTabsetPanel(session, inputId = "mainSimulationsPanel", selected = "simuLMpanel")
+  })
+  
+  
+  observeEvent(input$nextButton12, {
+    updateTabItems(session, "tabsSide", "Downloads")
+  })
   
   #/////////////////////////////////
   # Generate plots of the data ----
@@ -2378,7 +2831,7 @@ server <- function(input, output,session) {
   #--------------------------------------------------------------------------------
   #Functions to create SPINUP data from user inputdata
   #---------------------------------------------------------------------------------
-
+  
   spinup_lenght = 500 #in case of user input
   
   #--------------------------------------------------------------------------------
@@ -2490,7 +2943,7 @@ server <- function(input, output,session) {
   #--------------------------------------------------------------------------------
   ##This function retrieves ALL the climate data from ISIMIP for the selected site
   #---------------------------------------------------------------------------------
-  retreive_clim_data_site<-function(){
+  retreive_clim_data_site_potevap<-function(){
     ptm <- proc.time()
     
     
@@ -2511,6 +2964,22 @@ server <- function(input, output,session) {
     ###########################
     #Read forcing climate data
     ###########################
+    
+    #----------------------------------------------------
+    #Read potential evapotranspiration file rcp26
+    #----------------------------------------------------
+    potevap_file_rcp26<-nc_open("data/RCP26/MONTHLY_OUTPUTS/potevap_month_rcp26_2006_2100_mm.nc4")
+    #potevap_file_rcp26<-nc_open(paste0(temp_file,"/potevap_month_rcp26_2006_2100_mm.nc4"))
+    
+    #----------------------------------------------------
+    #Read lon-lat-time variables
+    lon_potevap_rcp26 <- ncvar_get(potevap_file_rcp26, varid = "lon")
+    lat_potevap_rcp26 <- ncvar_get(potevap_file_rcp26, varid = "lat")
+    potevap_time_rcp26 <- as.Date("1661-1-1") %m+% months(potevap_file_rcp26$dim$time$vals)
+    #Convert time to dates
+    potevap_time_plot_rcp26 <- as.Date.character(format(potevap_time_rcp26, "%Y-%m-%d"))
+    #Retrieve variable for whole time length
+    potevap_rcp26 <- ncvar_get(potevap_file_rcp26, "potevap")
     
     #ISIMIP data
     #----------------
@@ -2538,6 +3007,7 @@ server <- function(input, output,session) {
     potevap_time_sel_plot_spinup_rcp26 = as.Date.character(format(potevap_time_sel_spinup_rcp26, "%Y-%m-01"))
     
     Potevap_month_spinup_rcp26 = data.frame("Date"=potevap_time_sel_plot_spinup_rcp26,"Potevap"=potevap_sel_lonlat_timestep_rcp26_spinup)
+    
     
     #----------------------------------------------------
     #Retrieve forward (rcp26)
@@ -2568,10 +3038,35 @@ server <- function(input, output,session) {
     # print("Potevap")
     # print(head(Potevap_month_fwd_rcp26_sel))
     # print(tail(Potevap_month_fwd_rcp26_sel))
+    
+    rm(potevap_file_rcp26,lon_potevap_rcp26,lat_potevap_rcp26,potevap_time_rcp26,potevap_time_plot_rcp26,potevap_rcp26,
+       lon_index_potevap_rcp26,lat_index_potevap_rcp26,time_index_spinup_potevap_rcp26,potevap_sel_lonlat_timestep_rcp26_spinup,
+       potevap_time_sel_spinup_rcp26,potevap_time_sel_plot_spinup_rcp26,
+       time_index_fwd_potevap_rcp26,potevap_sel_lonlat_timestep_rcp26_fwd,potevap_time_sel_fwd_rcp26,potevap_time_sel_plot_fwd_rcp26)
+    
     print("POTEVAP 26 OK")
+    
+    
+    
     #----------------------------------------------------
     #Potevapotranspiration RCP60
     #----------------------------------------------------
+    #----------------------------------------------------
+    #Read potential evapotranspiration file rcp60
+    #----------------------------------------------------
+    potevap_file_rcp60<-nc_open("data/RCP60/MONTHLY_OUTPUTS/potevap_month_rcp60_2006_2100_mm.nc4")
+    #potevap_file_rcp60<-nc_open(paste0(temp_file,"/potevap_month_rcp60_2006_2100_mm.nc4"))
+    
+    #----------------------------------------------------
+    #Read lon-lat-time variables
+    lon_potevap_rcp60 <- ncvar_get(potevap_file_rcp60, varid = "lon")
+    lat_potevap_rcp60 <- ncvar_get(potevap_file_rcp60, varid = "lat")
+    potevap_time_rcp60 <- as.Date("1661-1-1") %m+% months(potevap_file_rcp60$dim$time$vals)
+    #Convert time to dates
+    potevap_time_plot_rcp60 <- as.Date.character(format(potevap_time_rcp60, "%Y-%m-%d"))
+    #Retrieve variable for whole time length
+    potevap_rcp60 <- ncvar_get(potevap_file_rcp60, "potevap")
+    
     #Define lon-lat values to retrieve, based on user input
     lon_index_potevap_rcp60 <- which.min(abs(lon_potevap_rcp60 - coordsLON()))
     lat_index_potevap_rcp60 <- which.min(abs(lat_potevap_rcp60 - coordsLAT()))
@@ -2606,12 +3101,54 @@ server <- function(input, output,session) {
     # print("potevap month")
     # print(tail(Potevap_month_fwd_rcp60,20))
     
+    rm(potevap_file_rcp60,lon_potevap_rcp60,lat_potevap_rcp60,potevap_time_rcp60,potevap_time_plot_rcp60,potevap_rcp60,
+       lon_index_potevap_rcp60,lat_index_potevap_rcp60,
+       time_index_fwd_potevap_rcp60,potevap_sel_lonlat_timestep_rcp60_fwd,potevap_time_sel_fwd_rcp60,potevap_time_sel_plot_fwd_rcp60)
+    
     print("POTEVAP 60 OK")
+    
+    print("Elapsed time (minutes)")
+    print((proc.time() - ptm)/60) #minutes
+    
+    return(list(Potevap_month_spinup_rcp26,Potevap_month_fwd_rcp26_sel,Potevap_month_fwd_rcp60_sel,
+                Potevap_month_fwd_rcp26,Potevap_month_fwd_rcp60))
+  }
+  
+  retreive_clim_data_site_temp<-function(){
+    ptm <- proc.time()
+    
+    
+    #---------------------
+    #Define forward simulation length [years]
+    #as number of data/time_step
+    #####################
+    # simulation_length=input$simulationlength
+    #if(simulation_length>80){simulation_length=80}
+    #Set max simulation length to 80
+    simulation_length<-min(simulation_length(),80)
     
     #----------------
     #Temperature data
     #----------------
     #Temperature RCP26
+    #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    #----------------------------------------------------
+    #Read temperature file rcp26
+    #----------------------------------------------------
+    temp_file_rcp26<-nc_open("data/RCP26/DAILY_FORCING/tas_month_rcp26_2006_2100_mm.nc4")
+    #temp_file_rcp26<-nc_open(paste0(temp_file,"/tas_month_rcp26_2006_2100_mm.nc4"))
+    
+    #----------------------------------------------------
+    #Read lon-lat-time variables
+    lon_temp_rcp26 <- ncvar_get(temp_file_rcp26, varid = "lon")
+    lat_temp_rcp26 <- ncvar_get(temp_file_rcp26, varid = "lat")
+    #temp_time_rcp26 <- as.Date("2006-1-1") %d+% days(temp_file_rcp26$dim$time$vals)
+    temp_time_rcp26 <- nc.get.time.series(temp_file_rcp26, v = "tas",
+                                          time.dim.name = "time")
+    #Convert time to dates
+    temp_time_plot_rcp26 <- as.Date.character(format(temp_time_rcp26, "%Y-%m-%d"))
+    #Retrieve variable for whole time length
+    temp_rcp26 <- ncvar_get(temp_file_rcp26, "tas")
     
     #----------------------------------------------------
     #Define lon-lat values to retrieve, based on user input
@@ -2662,10 +3199,34 @@ server <- function(input, output,session) {
     Temp_month_fwd_rcp26_sel = Temp_month_fwd_rcp26_sel[1:max_length,]
     
     
+    rm(temp_file_rcp26,lon_temp_rcp26,lat_temp_rcp26,temp_time_rcp26,temp_time_plot_rcp26,temp_rcp26,
+       lon_index_temp_rcp26,lat_index_temp_rcp26,time_index_spinup_temp_rcp26,temp_sel_lonlat_timestep_rcp26_spinup,
+       temp_time_sel_spinup_rcp26,temp_time_sel_plot_spinup_rcp26,
+       time_index_fwd_temp_rcp26,temp_sel_lonlat_timestep_rcp26_fwd,temp_time_sel_fwd_rcp26,temp_time_sel_plot_fwd_rcp26)
+    
+    
     
     #----------------------------------------------------
     #Temperature RCP60
     #----------------------------------------------------
+    
+    
+    #Read temperature file rcp60
+    #----------------------------------------------------
+    temp_file_rcp60<-nc_open("data/RCP60/DAILY_FORCING/tas_month_rcp60_2006_2100_mm.nc4")
+    #temp_file_rcp60<-nc_open(paste0(temp_file,"/tas_month_rcp60_2006_2100_mm.nc4"))
+    #----------------------------------------------------
+    #Read lon-lat-time variables
+    lon_temp_rcp60 <- ncvar_get(temp_file_rcp60, varid = "lon")
+    lat_temp_rcp60 <- ncvar_get(temp_file_rcp60, varid = "lat")
+    #temp_time_rcp60 <- as.Date("2006-1-1") %d+% days(temp_file_rcp60$dim$time$vals)
+    temp_time_rcp60 <- nc.get.time.series(temp_file_rcp60, v = "tas",
+                                          time.dim.name = "time")
+    #Convert time to dates
+    temp_time_plot_rcp60 <- as.Date.character(format(temp_time_rcp60, "%Y-%m-%d"))
+    #Retrieve variable for whole time length
+    temp_rcp60 <- ncvar_get(temp_file_rcp60, "tas")
+    
     #Define lon-lat values to retrieve, based on user input
     lon_index_temp_rcp60 <- which.min(abs(lon_temp_rcp60 - coordsLON()))
     lat_index_temp_rcp60 <- which.min(abs(lat_temp_rcp60 - coordsLAT()))
@@ -2697,14 +3258,119 @@ server <- function(input, output,session) {
     #Select number of years
     Temp_month_fwd_rcp60_sel = Temp_month_fwd_rcp60_sel[1:max_length,]
     
+    rm(temp_file_rcp60,lon_temp_rcp60,lat_temp_rcp60,temp_time_rcp60,temp_time_plot_rcp60,temp_rcp60,
+       lon_index_temp_rcp60,lat_index_temp_rcp60,
+       time_index_fwd_temp_rcp60,temp_sel_lonlat_timestep_rcp60_fwd,temp_time_sel_fwd_rcp60,temp_time_sel_plot_fwd_rcp60)
+    
+    
+    
+    #====
+    #Transform monthly to daily data
+    #====
+    #This function repeats the month's value for each day of the month
+    #That way we have daily data, although with a monthly variability
+    
+    #Spinup
+    Temp_day_spinup<-do.call("rbind", lapply(1:nrow(Temp_month_spinup_rcp26), function(i) 
+      data.frame(Date = seq(Temp_month_spinup_rcp26$Date[i], 
+                            (seq(Temp_month_spinup_rcp26$Date[i],length=2,by="months") - 1)[2], by = "1 days"), 
+                 Temp = Temp_month_spinup_rcp26$Temp[i])))
+    
+    # print("temp day ok")
+    # print(tail(Temp_day_spinup))
+    
+    #Fwd slected
+    
+    Temp_day_fwd_rcp26_sel<-do.call("rbind", lapply(1:nrow(Temp_month_fwd_rcp26_sel), function(i) 
+      data.frame(Date = seq(Temp_month_fwd_rcp26_sel$Date[i]- day(Temp_month_fwd_rcp26_sel$Date[i]) +1,#from day 1
+                            Temp_month_fwd_rcp26_sel$Date[i]- day(Temp_month_fwd_rcp26_sel$Date[i]) +as.numeric(days_in_month(Temp_month_fwd_rcp26_sel$Date[i])),#to last day month
+                            by = "1 days"), 
+                 Temp = Temp_month_fwd_rcp26_sel$Temp[i])))
+    # print("Temp")
+    # print(head(Temp_day_fwd_rcp26_sel))
+    # print(tail(Temp_day_fwd_rcp26_sel))
+    
+    
+    
+    #Fwd climate change scenario RCP26
+    
+    Temp_day_fwd_rcp26<-do.call("rbind", lapply(1:nrow(Temp_month_fwd_rcp26), function(i)
+      data.frame(Date = seq(Temp_month_fwd_rcp26$Date[i]- day(Temp_month_fwd_rcp26$Date[i]) +1,#from day 1
+                            Temp_month_fwd_rcp26$Date[i]- day(Temp_month_fwd_rcp26$Date[i]) +as.numeric(days_in_month(Temp_month_fwd_rcp26$Date[i])),#to last day month
+                            by = "1 days"),
+                 Temp = Temp_month_fwd_rcp26$Temp[i])))
+    
+    
+    # print("temp day ")
+    # print(tail(Temp_day_fwd_rcp26,20))
+    
+    
+    
+    #Fwd climate change scenario RCP60
+    
+    Temp_day_fwd_rcp60<-do.call("rbind", lapply(1:nrow(Temp_month_fwd_rcp60), function(i) 
+      data.frame(Date = seq(Temp_month_fwd_rcp60$Date[i]- day(Temp_month_fwd_rcp60$Date[i]) +1,#from day 1
+                            Temp_month_fwd_rcp60$Date[i]- day(Temp_month_fwd_rcp60$Date[i]) +as.numeric(days_in_month(Temp_month_fwd_rcp60$Date[i])),#to last day month
+                            by = "1 days"), 
+                 Temp = Temp_month_fwd_rcp60$Temp[i])))
+    
+    
+    
+    
+    #Select by simulation length
+    
+    Temp_day_fwd_rcp60_sel<-do.call("rbind", lapply(1:nrow(Temp_month_fwd_rcp60_sel), function(i) 
+      data.frame(Date = seq(Temp_month_fwd_rcp60_sel$Date[i]- day(Temp_month_fwd_rcp60_sel$Date[i]) +1,#from day 1
+                            Temp_month_fwd_rcp60_sel$Date[i]- day(Temp_month_fwd_rcp60_sel$Date[i]) +as.numeric(days_in_month(Temp_month_fwd_rcp60_sel$Date[i])),#to last day month
+                            by = "1 days"), 
+                 Temp = Temp_month_fwd_rcp60_sel$Temp[i])))
     
     print("TEMP OK")
+    
+    print("Elapsed time (minutes)")
+    print((proc.time() - ptm)/60) #minutes
+    
+    return(list(Temp_day_spinup,Temp_day_fwd_rcp26_sel,Temp_day_fwd_rcp60_sel,
+                Temp_day_fwd_rcp26,Temp_day_fwd_rcp60))
+    
+  }
+  retreive_clim_data_site_precip<-function(){
+    ptm <- proc.time()
+    
+    
+    #---------------------
+    #Define forward simulation length [years]
+    #as number of data/time_step
+    #####################
+    # simulation_length=input$simulationlength
+    #if(simulation_length>80){simulation_length=80}
+    #Set max simulation length to 80
+    simulation_length<-min(simulation_length(),80)
     
     #----------------
     #Precipitation data 
     #----------------
     #Precipitation RCP26
     #----------------------------------------------------
+    
+    #----------------------------------------------------
+    #Read prec file rcp26 (rain+snow)
+    #----------------------------------------------------
+    prec_file_rcp26<-nc_open("data/RCP26/DAILY_FORCING/prec_month_rcp26_2006_2100_mm.nc4")
+    #prec_file_rcp26<-nc_open(paste0(temp_file,"/prec_month_rcp26_2006_2100_mm.nc4"))
+    #----------------------------------------------------
+    #Read lon-lat-time variables
+    lon_prec_rcp26 <- ncvar_get(prec_file_rcp26, varid = "lon")
+    lat_prec_rcp26 <- ncvar_get(prec_file_rcp26, varid = "lat")
+    #prec_time_rcp26 <- as.Date("2006-1-1") %d+% days(prec_file_rcp26$dim$time$vals)
+    prec_time_rcp26 <- nc.get.time.series(prec_file_rcp26, v = "pr",
+                                          time.dim.name = "time")
+    #Convert time to dates
+    prec_time_plot_rcp26 <- as.Date.character(format(prec_time_rcp26, "%Y-%m-%d"))
+    #Retrieve variable for whole time length
+    prec_rcp26 <- ncvar_get(prec_file_rcp26, "pr")
+    
+    
     #Define lon-lat values to retrieve, based on user input
     lon_index_prec_rcp26 <- which.min(abs(lon_prec_rcp26 - coordsLON()))
     lat_index_prec_rcp26 <- which.min(abs(lat_prec_rcp26 - coordsLAT()))
@@ -2755,9 +3421,34 @@ server <- function(input, output,session) {
     #Select number of years
     Prec_month_fwd_rcp26_sel = Prec_month_fwd_rcp26_sel[1:max_length,]
     
+    rm(prec_file_rcp26,lon_prec_rcp26,lat_prec_rcp26,prec_time_rcp26,prec_time_plot_rcp26,prec_rcp26,
+       lon_index_prec_rcp26,lat_index_prec_rcp26,time_index_spinup_prec_rcp26,prec_sel_lonlat_timestep_rcp26_spinup,
+       prec_time_sel_spinup_rcp26,prec_time_sel_plot_spinup_rcp26,
+       time_index_fwd_prec_rcp26,prec_sel_lonlat_timestep_rcp26_fwd,prec_time_sel_fwd_rcp26,prec_time_sel_plot_fwd_rcp26)
+    
+    
+    
     #---------------------------------------------------
     #Precipitation RCP60
     #----------------------------------------------------
+    
+    #----------------------------------------------------
+    #Read prec file rcp60
+    #----------------------------------------------------
+    prec_file_rcp60<-nc_open("data/RCP60/DAILY_FORCING/prec_month_rcp60_2006_2100_mm.nc4")
+    #prec_file_rcp60<-nc_open(paste0(temp_file,"/prec_month_rcp60_2006_2100_mm.nc4"))
+    #----------------------------------------------------
+    #Read lon-lat-time variables
+    lon_prec_rcp60 <- ncvar_get(prec_file_rcp60, varid = "lon")
+    lat_prec_rcp60 <- ncvar_get(prec_file_rcp60, varid = "lat")
+    #prec_time_rcp60 <- as.Date("2006-1-1") %d+% days(prec_file_rcp60$dim$time$vals)
+    prec_time_rcp60 <- nc.get.time.series(prec_file_rcp60, v = "pr",
+                                          time.dim.name = "time")
+    #Convert time to dates
+    prec_time_plot_rcp60 <- as.Date.character(format(prec_time_rcp60, "%Y-%m-%d"))
+    #Retrieve variable for whole time length
+    prec_rcp60 <- ncvar_get(prec_file_rcp60, "pr")
+    
     #Define lon-lat values to retrieve, based on user input
     lon_index_prec_rcp60 <- which.min(abs(lon_prec_rcp60 - coordsLON()))
     lat_index_prec_rcp60 <- which.min(abs(lat_prec_rcp60 - coordsLAT()))
@@ -2789,14 +3480,92 @@ server <- function(input, output,session) {
     #Select number of years
     Prec_month_fwd_rcp60_sel = Prec_month_fwd_rcp60_sel[1:max_length,]
     
+    rm(prec_file_rcp60,lon_prec_rcp60,lat_prec_rcp60,prec_time_rcp60,prec_time_plot_rcp60,prec_rcp60,
+       lon_index_prec_rcp60,lat_index_prec_rcp60,
+       time_index_fwd_prec_rcp60,prec_sel_lonlat_timestep_rcp60_fwd,prec_time_sel_fwd_rcp60,prec_time_sel_plot_fwd_rcp60)
     
     print("PREC OK")
+    
+    
+    
+    mean_days_in_months <- mean(c(31,28,31,30,31,30,31,31,30,31,30,31))
+    
+    Precip_day_spinup<-do.call("rbind", lapply(1:nrow(Prec_month_spinup_rcp26), function(i) 
+      data.frame(Date = seq(Prec_month_spinup_rcp26$Date[i], 
+                            (seq(Prec_month_spinup_rcp26$Date[i],length=2,by="months") - 1)[2], by = "1 days"), 
+                 Precip = Prec_month_spinup_rcp26$Precip[i]/mean_days_in_months)))
+    
+    Precip_day_fwd_rcp26_sel<-do.call("rbind", lapply(1:nrow(Prec_month_fwd_rcp26_sel), function(i) 
+      data.frame(Date = seq(Prec_month_fwd_rcp26_sel$Date[i]- day(Prec_month_fwd_rcp26_sel$Date[i]) +1,#from day 1
+                            Prec_month_fwd_rcp26_sel$Date[i]- day(Prec_month_fwd_rcp26_sel$Date[i]) +as.numeric(days_in_month(Prec_month_fwd_rcp26_sel$Date[i])),#to last day month
+                            by = "1 days"), 
+                 Precip = Prec_month_fwd_rcp26_sel$Precip[i]/mean_days_in_months)))
+    
+    Precip_day_fwd_rcp26<-do.call("rbind", lapply(1:nrow(Prec_month_fwd_rcp26), function(i) 
+      data.frame(Date = seq(Prec_month_fwd_rcp26$Date[i]- day(Prec_month_fwd_rcp26$Date[i]) +1,#from day 1
+                            Prec_month_fwd_rcp26$Date[i]- day(Prec_month_fwd_rcp26$Date[i]) +as.numeric(days_in_month(Prec_month_fwd_rcp26$Date[i])),#to last day month
+                            by = "1 days"), 
+                 Precip = Prec_month_fwd_rcp26$Precip[i]/mean_days_in_months)))
+    # print("precip day ")
+    # print(tail(Precip_day_fwd_rcp26,20))
+    
+    Precip_day_fwd_rcp60<-do.call("rbind", lapply(1:nrow(Prec_month_fwd_rcp60), function(i) 
+      data.frame(Date = seq(Prec_month_fwd_rcp60$Date[i]- day(Prec_month_fwd_rcp60$Date[i]) +1,#from day 1
+                            Prec_month_fwd_rcp60$Date[i]- day(Prec_month_fwd_rcp60$Date[i]) +as.numeric(days_in_month(Prec_month_fwd_rcp60$Date[i])),#to last day month
+                            by = "1 days"), 
+                 Precip = Prec_month_fwd_rcp60$Precip[i]/mean_days_in_months)))
+    
+    Precip_day_fwd_rcp60_sel<-do.call("rbind", lapply(1:nrow(Prec_month_fwd_rcp60_sel), function(i) 
+      data.frame(Date = seq(Prec_month_fwd_rcp60_sel$Date[i]- day(Prec_month_fwd_rcp60_sel$Date[i]) +1,#from day 1
+                            Prec_month_fwd_rcp60_sel$Date[i]- day(Prec_month_fwd_rcp60_sel$Date[i]) +as.numeric(days_in_month(Prec_month_fwd_rcp60_sel$Date[i])),#to last day month
+                            by = "1 days"), 
+                 Precip = Prec_month_fwd_rcp60_sel$Precip[i]/mean_days_in_months)))
+    
+    
+    print("Elapsed time (minutes)")
+    print((proc.time() - ptm)/60) #minutes
+    
+    return(list(Precip_day_spinup,Precip_day_fwd_rcp26_sel,Precip_day_fwd_rcp60_sel,
+                Precip_day_fwd_rcp26,Precip_day_fwd_rcp60))
+    
+  }
+  
+  retreive_clim_data_site_vswc<-function(){
+    ptm <- proc.time()
+    
+    
+    #---------------------
+    #Define forward simulation length [years]
+    #as number of data/time_step
+    #####################
+    # simulation_length=input$simulationlength
+    #if(simulation_length>80){simulation_length=80}
+    #Set max simulation length to 80
+    simulation_length<-min(simulation_length(),80)
     
     #----------------
     #Soil moisture (top 18 cm)=>(m3/m3)
     #----------------
     
     #Soil moisture RCP26
+    #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    #----------------------------------------------------
+    #Read soil moisture file rcp26
+    #----------------------------------------------------
+    vswc_file_rcp26<-nc_open("data/RCP26/MONTHLY_OUTPUTS/soilmoist_2006_2009_rcp26_mm3mm3_top18_mm.nc4")
+    #vswc_file_rcp26<-nc_open(paste0(temp_file,"/soilmoist_2006_2009_rcp26_mm3mm3_top18_mm.nc4"))
+    #----------------------------------------------------
+    #Read lon-lat-time variables
+    lon_vswc_rcp26 <- ncvar_get(vswc_file_rcp26, varid = "lon")
+    lat_vswc_rcp26 <- ncvar_get(vswc_file_rcp26, varid = "lat")
+    #lay_vswc_rcp60 <- ncvar_get(vswc_file_rcp26, varid = "solay")
+    
+    vswc_time_rcp26 <- as.Date("1661-1-1") %m+% months(vswc_file_rcp26$dim$time$vals)
+    #Convert time to dates
+    vswc_time_plot_rcp26 <- as.Date.character(format(vswc_time_rcp26, "%Y-%m-%d"))
+    #Retrieve variable for whole time length
+    vswc_rcp26 <- ncvar_get(vswc_file_rcp26, "soilmoist")
+    
     
     #----------------------------------------------------
     #Define lon-lat values to retrieve, based on user input
@@ -2841,6 +3610,29 @@ server <- function(input, output,session) {
     #Select number of years
     Vswc_month_fwd_rcp26_sel = Vswc_month_fwd_rcp26_sel[1:max_length,]
     
+    rm(vswc_file_rcp26,lon_vswc_rcp26,lat_vswc_rcp26,vswc_time_rcp26,vswc_time_plot_rcp26,vswc_rcp26,
+       lon_index_vswc_rcp26,lat_index_vswc_rcp26,time_index_spinup_vswc_rcp26,vswc_sel_lonlat_timestep_rcp26_spinup,
+       vswc_time_sel_spinup_rcp26,vswc_time_sel_plot_spinup_rcp26,
+       time_index_fwd_vswc_rcp26,vswc_sel_lonlat_timestep_rcp26_fwd,vswc_time_sel_fwd_rcp26,vswc_time_sel_plot_fwd_rcp26)
+    
+    
+    
+    #----------------------------------------------------
+    #Read soil moisture file rcp60
+    #----------------------------------------------------
+    vswc_file_rcp60<-nc_open("data/RCP60/MONTHLY_OUTPUTS/soilmoist_2006_2009_rcp60_mm3mm3_top18_mm.nc4")
+    #vswc_file_rcp60<-nc_open(paste0(temp_file,"/soilmoist_2006_2009_rcp60_mm3mm3_top18_mm.nc4"))
+    
+    #----------------------------------------------------
+    #Read lon-lat-time variables
+    lon_vswc_rcp60 <- ncvar_get(vswc_file_rcp60, varid = "lon")
+    lat_vswc_rcp60 <- ncvar_get(vswc_file_rcp60, varid = "lat")
+    vswc_time_rcp60 <- as.Date("1661-1-1") %m+% months(vswc_file_rcp60$dim$time$vals)
+    #Convert time to dates
+    vswc_time_plot_rcp60 <- as.Date.character(format(vswc_time_rcp60, "%Y-%m-%d"))
+    #Retrieve variable for whole time length
+    vswc_rcp60 <- ncvar_get(vswc_file_rcp60, "soilmoist")
+    
     #----------------------------------------------------
     #Soil moisture RCP60
     #----------------------------------------------------
@@ -2878,55 +3670,15 @@ server <- function(input, output,session) {
     Vswc_month_fwd_rcp60_sel = Vswc_month_fwd_rcp60_sel[1:max_length,]
     
     
-    print("SOIL MOIST OK")
+    rm(vswc_file_rcp60,lon_vswc_rcp60,lat_vswc_rcp60,vswc_time_rcp60,vswc_time_plot_rcp60,vswc_rcp60,
+       lon_index_vswc_rcp60,lat_index_vswc_rcp60,
+       time_index_fwd_vswc_rcp60,vswc_sel_lonlat_timestep_rcp60_fwd,vswc_time_sel_fwd_rcp60,vswc_time_sel_plot_fwd_rcp60)
     
-    #====
-    #Transform monthly to daily data
-    #====
-    #This function repeats the month's value for each day of the month
-    #That way we have daily data, although with a monthly variability
-    
-    #Spinup
-    Temp_day_spinup<-do.call("rbind", lapply(1:nrow(Temp_month_spinup_rcp26), function(i) 
-      data.frame(Date = seq(Temp_month_spinup_rcp26$Date[i], 
-                            (seq(Temp_month_spinup_rcp26$Date[i],length=2,by="months") - 1)[2], by = "1 days"), 
-                 Temp = Temp_month_spinup_rcp26$Temp[i])))
-    
-    # print("temp day ok")
-    # print(tail(Temp_day_spinup))
-    
-    mean_days_in_months <- mean(c(31,28,31,30,31,30,31,31,30,31,30,31))
-    
-    Precip_day_spinup<-do.call("rbind", lapply(1:nrow(Prec_month_spinup_rcp26), function(i) 
-      data.frame(Date = seq(Prec_month_spinup_rcp26$Date[i], 
-                            (seq(Prec_month_spinup_rcp26$Date[i],length=2,by="months") - 1)[2], by = "1 days"), 
-                 Precip = Prec_month_spinup_rcp26$Precip[i]/mean_days_in_months)))
     
     Vswc_day_spinup<-do.call("rbind", lapply(1:nrow(Vswc_month_spinup_rcp26), function(i) 
       data.frame(Date = seq(Vswc_month_spinup_rcp26$Date[i], 
                             (seq(Vswc_month_spinup_rcp26$Date[i],length=2,by="months") - 1)[2], by = "1 days"), 
                  Vswc = Vswc_month_spinup_rcp26$Vswc[i])))
-    
-    
-    # print("prec day ok")
-    # print(tail(Precip_day_spinup))
-    
-    #Fwd slected
-    
-    Temp_day_fwd_rcp26_sel<-do.call("rbind", lapply(1:nrow(Temp_month_fwd_rcp26_sel), function(i) 
-      data.frame(Date = seq(Temp_month_fwd_rcp26_sel$Date[i]- day(Temp_month_fwd_rcp26_sel$Date[i]) +1,#from day 1
-                            Temp_month_fwd_rcp26_sel$Date[i]- day(Temp_month_fwd_rcp26_sel$Date[i]) +as.numeric(days_in_month(Temp_month_fwd_rcp26_sel$Date[i])),#to last day month
-                            by = "1 days"), 
-                 Temp = Temp_month_fwd_rcp26_sel$Temp[i])))
-    # print("Temp")
-    # print(head(Temp_day_fwd_rcp26_sel))
-    # print(tail(Temp_day_fwd_rcp26_sel))
-    
-    Precip_day_fwd_rcp26_sel<-do.call("rbind", lapply(1:nrow(Prec_month_fwd_rcp26_sel), function(i) 
-      data.frame(Date = seq(Prec_month_fwd_rcp26_sel$Date[i]- day(Prec_month_fwd_rcp26_sel$Date[i]) +1,#from day 1
-                            Prec_month_fwd_rcp26_sel$Date[i]- day(Prec_month_fwd_rcp26_sel$Date[i]) +as.numeric(days_in_month(Prec_month_fwd_rcp26_sel$Date[i])),#to last day month
-                            by = "1 days"), 
-                 Precip = Prec_month_fwd_rcp26_sel$Precip[i]/mean_days_in_months)))
     
     Vswc_day_fwd_rcp26_sel<-do.call("rbind", lapply(1:nrow(Vswc_month_fwd_rcp26_sel), function(i) 
       data.frame(Date = seq(Vswc_month_fwd_rcp26_sel$Date[i]- day(Vswc_month_fwd_rcp26_sel$Date[i]) +1,#from day 1
@@ -2934,46 +3686,11 @@ server <- function(input, output,session) {
                             by = "1 days"), 
                  Vswc = Vswc_month_fwd_rcp26_sel$Vswc[i])))
     
-    
-    #Fwd climate change scenario RCP26
-    
-    Temp_day_fwd_rcp26<-do.call("rbind", lapply(1:nrow(Temp_month_fwd_rcp26), function(i)
-      data.frame(Date = seq(Temp_month_fwd_rcp26$Date[i]- day(Temp_month_fwd_rcp26$Date[i]) +1,#from day 1
-                            Temp_month_fwd_rcp26$Date[i]- day(Temp_month_fwd_rcp26$Date[i]) +as.numeric(days_in_month(Temp_month_fwd_rcp26$Date[i])),#to last day month
-                            by = "1 days"),
-                 Temp = Temp_month_fwd_rcp26$Temp[i])))
-    
-    
-    # print("temp day ")
-    # print(tail(Temp_day_fwd_rcp26,20))
-    
-    Precip_day_fwd_rcp26<-do.call("rbind", lapply(1:nrow(Prec_month_fwd_rcp26), function(i) 
-      data.frame(Date = seq(Prec_month_fwd_rcp26$Date[i]- day(Prec_month_fwd_rcp26$Date[i]) +1,#from day 1
-                            Prec_month_fwd_rcp26$Date[i]- day(Prec_month_fwd_rcp26$Date[i]) +as.numeric(days_in_month(Prec_month_fwd_rcp26$Date[i])),#to last day month
-                            by = "1 days"), 
-                 Precip = Prec_month_fwd_rcp26$Precip[i]/mean_days_in_months)))
-    # print("precip day ")
-    # print(tail(Precip_day_fwd_rcp26,20))
-    
     Vswc_day_fwd_rcp26<-do.call("rbind", lapply(1:nrow(Vswc_month_fwd_rcp26), function(i) 
       data.frame(Date = seq(Vswc_month_fwd_rcp26$Date[i]- day(Vswc_month_fwd_rcp26$Date[i]) +1,#from day 1
                             Vswc_month_fwd_rcp26$Date[i]- day(Vswc_month_fwd_rcp26$Date[i]) +as.numeric(days_in_month(Vswc_month_fwd_rcp26$Date[i])),#to last day month
                             by = "1 days"), 
                  Vswc = Vswc_month_fwd_rcp26$Vswc[i])))
-    
-    #Fwd climate change scenario RCP60
-    
-    Temp_day_fwd_rcp60<-do.call("rbind", lapply(1:nrow(Temp_month_fwd_rcp60), function(i) 
-      data.frame(Date = seq(Temp_month_fwd_rcp60$Date[i]- day(Temp_month_fwd_rcp60$Date[i]) +1,#from day 1
-                            Temp_month_fwd_rcp60$Date[i]- day(Temp_month_fwd_rcp60$Date[i]) +as.numeric(days_in_month(Temp_month_fwd_rcp60$Date[i])),#to last day month
-                            by = "1 days"), 
-                 Temp = Temp_month_fwd_rcp60$Temp[i])))
-    
-    Precip_day_fwd_rcp60<-do.call("rbind", lapply(1:nrow(Prec_month_fwd_rcp60), function(i) 
-      data.frame(Date = seq(Prec_month_fwd_rcp60$Date[i]- day(Prec_month_fwd_rcp60$Date[i]) +1,#from day 1
-                            Prec_month_fwd_rcp60$Date[i]- day(Prec_month_fwd_rcp60$Date[i]) +as.numeric(days_in_month(Prec_month_fwd_rcp60$Date[i])),#to last day month
-                            by = "1 days"), 
-                 Precip = Prec_month_fwd_rcp60$Precip[i]/mean_days_in_months)))
     
     Vswc_day_fwd_rcp60<-do.call("rbind", lapply(1:nrow(Vswc_month_fwd_rcp60), function(i) 
       data.frame(Date = seq(Vswc_month_fwd_rcp60$Date[i]- day(Vswc_month_fwd_rcp60$Date[i]) +1,#from day 1
@@ -2981,57 +3698,49 @@ server <- function(input, output,session) {
                             by = "1 days"), 
                  Vswc = Vswc_month_fwd_rcp60$Vswc[i])))
     
-    
-    #Select by simulation length
-    
-    Temp_day_fwd_rcp60_sel<-do.call("rbind", lapply(1:nrow(Temp_month_fwd_rcp60_sel), function(i) 
-      data.frame(Date = seq(Temp_month_fwd_rcp60_sel$Date[i]- day(Temp_month_fwd_rcp60_sel$Date[i]) +1,#from day 1
-                            Temp_month_fwd_rcp60_sel$Date[i]- day(Temp_month_fwd_rcp60_sel$Date[i]) +as.numeric(days_in_month(Temp_month_fwd_rcp60_sel$Date[i])),#to last day month
-                            by = "1 days"), 
-                 Temp = Temp_month_fwd_rcp60_sel$Temp[i])))
-    
-    
-    Precip_day_fwd_rcp60_sel<-do.call("rbind", lapply(1:nrow(Prec_month_fwd_rcp60_sel), function(i) 
-      data.frame(Date = seq(Prec_month_fwd_rcp60_sel$Date[i]- day(Prec_month_fwd_rcp60_sel$Date[i]) +1,#from day 1
-                            Prec_month_fwd_rcp60_sel$Date[i]- day(Prec_month_fwd_rcp60_sel$Date[i]) +as.numeric(days_in_month(Prec_month_fwd_rcp60_sel$Date[i])),#to last day month
-                            by = "1 days"), 
-                 Precip = Prec_month_fwd_rcp60_sel$Precip[i]/mean_days_in_months)))
-    
     Vswc_day_fwd_rcp60_sel<-do.call("rbind", lapply(1:nrow(Vswc_month_fwd_rcp60_sel), function(i) 
       data.frame(Date = seq(Vswc_month_fwd_rcp60_sel$Date[i]- day(Vswc_month_fwd_rcp60_sel$Date[i]) +1,#from day 1
                             Vswc_month_fwd_rcp60_sel$Date[i]- day(Vswc_month_fwd_rcp60_sel$Date[i]) +as.numeric(days_in_month(Vswc_month_fwd_rcp60_sel$Date[i])),#to last day month
                             by = "1 days"), 
                  Vswc = Vswc_month_fwd_rcp60_sel$Vswc[i])))
     
-    print("data read ok")
+    print("SOIL MOIST OK")
     
     print("Elapsed time (minutes)")
     print((proc.time() - ptm)/60) #minutes
     
-    
-    ###############################
-    #Return a list of 20 elements
-    ##############################
-    #spinup - fwd rcp2.6 - fwd rcp 6.0
-    #1-3: potential evapotranspiration (mm/month) - sel
-    #4-6: precipitation (mm), daily -sel
-    #7-9: temperature (C), daily -sel
-    #10-12: soil moisture (mm3/mm3) top 10cm, daily -sel
-    
-    #13-14: potential evapotranspiration (mm/month) - all
-    #15-16: precipitation (mm), daily -all
-    #17-18: temperature (C), daily -all
-    #19-20: soil moisture (mm3/mm3) top 10cm, daily -all
-    
-    return(list(Potevap_month_spinup_rcp26,Potevap_month_fwd_rcp26_sel,Potevap_month_fwd_rcp60_sel,
-                Precip_day_spinup,Precip_day_fwd_rcp26_sel,Precip_day_fwd_rcp60_sel,
-                Temp_day_spinup,Temp_day_fwd_rcp26_sel,Temp_day_fwd_rcp60_sel,
-                Vswc_day_spinup,Vswc_day_fwd_rcp26_sel,Vswc_day_fwd_rcp60_sel,
-                Potevap_month_fwd_rcp26,Potevap_month_fwd_rcp60,
-                Precip_day_fwd_rcp26,Precip_day_fwd_rcp60,
-                Temp_day_fwd_rcp26,Temp_day_fwd_rcp60,
+    return(list(Vswc_day_spinup,Vswc_day_fwd_rcp26_sel,Vswc_day_fwd_rcp60_sel,
                 Vswc_day_fwd_rcp26,Vswc_day_fwd_rcp60))
+    
   }
+  
+  
+  
+  
+  # ###############################
+  # #Return a list of 20 elements
+  # ##############################
+  # #spinup - fwd rcp2.6 - fwd rcp 6.0
+  # #1-3: potential evapotranspiration (mm/month) - sel
+  # #4-6: precipitation (mm), daily -sel
+  # #7-9: temperature (C), daily -sel
+  # #10-12: soil moisture (mm3/mm3) top 10cm, daily -sel
+  # 
+  # #13-14: potential evapotranspiration (mm/month) - all
+  # #15-16: precipitation (mm), daily -all
+  # #17-18: temperature (C), daily -all
+  # #19-20: soil moisture (mm3/mm3) top 10cm, daily -all
+  # 
+  # 
+  # 
+  # return(list(Potevap_month_spinup_rcp26,Potevap_month_fwd_rcp26_sel,Potevap_month_fwd_rcp60_sel,
+  #             Precip_day_spinup,Precip_day_fwd_rcp26_sel,Precip_day_fwd_rcp60_sel,
+  #             Temp_day_spinup,Temp_day_fwd_rcp26_sel,Temp_day_fwd_rcp60_sel,
+  #             Vswc_day_spinup,Vswc_day_fwd_rcp26_sel,Vswc_day_fwd_rcp60_sel,
+  #             Potevap_month_fwd_rcp26,Potevap_month_fwd_rcp60,
+  #             Precip_day_fwd_rcp26,Precip_day_fwd_rcp60,
+  #             Temp_day_fwd_rcp26,Temp_day_fwd_rcp60,
+  #             Vswc_day_fwd_rcp26,Vswc_day_fwd_rcp60))
   
   
   #  observeEvent(input$button,{
@@ -3042,244 +3751,416 @@ server <- function(input, output,session) {
   
   observe({
     output$climate_plots<-renderPlot({
-      #User climate data, or if not input, ISIMIP RCP2.6
-      print("enter climate_plots")
       
-      #Fwd
-      Potevap_month = data_potevap()
-      Temp_day = data_temperature()
-      Precip_day = data_precipitation()
-      Vswc_day = data_vswc()
+      # Create 0-row data frame which will be used to store data
+      dat <- data.frame(x = numeric(0), y = numeric(0))
+      ######################################################################################################
+      withProgress(message = 'Processing', value = 0, {
+        # Number of times we'll go through the loop
+        n_progr<-13
+        i_progr<-1
+        
+        ######################################################################################################
+        
+        #User climate data, or if not input, ISIMIP RCP2.6
+        print("enter climate_plots")
+        
+        # Each time through the loop, add another row of data. This is
+        # a stand-in for a long-running computation.
+        dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+        # Increment the progress bar, and update the detail text.
+        incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+        
+        #Fwd
+        Potevap_month = data_potevap()
+        
+        # Each time through the loop, add another row of data. This is
+        # a stand-in for a long-running computation.
+        dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+        
+        # Increment the progress bar, and update the detail text.
+        i_progr<-i_progr+1
+        incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+        
+        Temp_day = data_temperature()
+        
+        # Each time through the loop, add another row of data. This is
+        # a stand-in for a long-running computation.
+        dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+        # Increment the progress bar, and update the detail text.
+        i_progr<-i_progr+1
+        incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+        
+        Precip_day = data_precipitation()
+        # Each time through the loop, add another row of data. This is
+        # a stand-in for a long-running computation.
+        dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+        
+        # Increment the progress bar, and update the detail text.
+        i_progr<-i_progr+1
+        incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+        
+        Vswc_day = data_vswc()
+        # Each time through the loop, add another row of data. This is
+        # a stand-in for a long-running computation.
+        dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+        
+        # Increment the progress bar, and update the detail text.
+        i_progr<-i_progr+1
+        incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))     
+        
+        
+        #If these variables are set to true, it means that the user has input climate data
+        #Then we plot both the user and ISIMIP data together
+        if((values$set_temp_user_data & 
+            values$set_prec_user_data &
+            values$set_potevap_user_data &
+            values$set_vswc_user_data)){
+          
+          
+          print("plotting both user and isimip data together")
+          
+          ##################
+          ### USERD DATA ##
+          ##################
+          #Convert daily variables to monthly for plots
+          years_months <- format(Temp_day$Date, "%Y-%m")
+          Temp_month <- aggregate(Temp_day$Temp ~ years_months, data = Temp_day , mean)
+          colnames(Temp_month)=c("Date","Temp")
+          Temp_month$Date<-as.Date(paste(Temp_month$Date, "01", sep = "-"))
+          
+          years_months <- format(Precip_day$Date, "%Y-%m")
+          Precip_month <- aggregate(Precip_day$Precip ~ years_months, data = Precip_day , sum)
+          colnames(Precip_month)=c("Date","Precip")
+          Precip_month$Date<-as.Date(paste(Precip_month$Date, "01", sep = "-"))
+          
+          years_months <- format(Vswc_day$Date, "%Y-%m")
+          Vswc_month <- aggregate(Vswc_day$Vswc ~ years_months, data = Vswc_day , mean)
+          colnames(Vswc_month)=c("Date","Vswc")
+          Vswc_month$Date<-as.Date(paste(Vswc_month$Date, "01", sep = "-"))
+          
+          
+          ##################
+          ### ISIMIP DATA ##
+          ##################
+          
+          #Run retreive_clim_data_site function to retrieve climate data for site
+          #data_clim = retreive_clim_data_site()
+          
+          
+          data_clim_potevap<-retreive_clim_data_site_potevap()
+          #Potevap_month_spinup_rcp26=data_clim_potevap[[1]]
+          Potevap_month_fwd_rcp26_sel=data_clim_potevap[[2]]
+          Potevap_month_fwd_rcp60_sel=data_clim_potevap[[3]]
+          
+          # Each time through the loop, add another row of data. This is
+          # a stand-in for a long-running computation.
+          dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+          
+          # Increment the progress bar, and update the detail text.
+          i_progr<-i_progr+1
+          incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+          
+          data_clim_precip<-retreive_clim_data_site_precip()
+          #Precip_day_spinup=data_clim_precip[[1]]
+          Precip_day_fwd_rcp26_sel=data_clim_precip[[2]]
+          Precip_day_fwd_rcp60_sel=data_clim_precip[[3]]
+          
+          # Each time through the loop, add another row of data. This is
+          # a stand-in for a long-running computation.
+          dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+          
+          # Increment the progress bar, and update the detail text.
+          i_progr<-i_progr+1
+          incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+          
+          data_clim_temp<-retreive_clim_data_site_temp()
+          #Temp_day_spinup=data_clim_temp[[1]]
+          Temp_day_fwd_rcp26_sel=data_clim_temp[[2]]
+          Temp_day_fwd_rcp60_sel=data_clim_temp[[3]]
+          
+          # Each time through the loop, add another row of data. This is
+          # a stand-in for a long-running computation.
+          dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+          
+          # Increment the progress bar, and update the detail text.
+          i_progr<-i_progr+1
+          incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+          
+          data_clim_vswc<-retreive_clim_data_site_vswc()
+          #Vswc_day_spinup=data_clim_vswc[[1]]
+          Vswc_day_fwd_rcp26_sel=data_clim_vswc[[2]]
+          Vswc_day_fwd_rcp60_sel=data_clim_vswc[[3]]
+          
+          # Each time through the loop, add another row of data. This is
+          # a stand-in for a long-running computation.
+          dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+          
+          # Increment the progress bar, and update the detail text.
+          i_progr<-i_progr+1
+          incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+          
+          #Convert daily variables to monthly for plots
+          years_months <- format(Temp_day_fwd_rcp26_sel$Date, "%Y-%m")
+          Temp_month_fwd_rcp26_sel <- aggregate(Temp_day_fwd_rcp26_sel$Temp ~ years_months, data = Temp_day_fwd_rcp26_sel , mean)
+          colnames(Temp_month_fwd_rcp26_sel)=c("Date","Temp")
+          Temp_month_fwd_rcp26_sel$Date<-as.Date(paste(Temp_month_fwd_rcp26_sel$Date, "01", sep = "-"))
+          
+          Temp_month_fwd_rcp60_sel <- aggregate(Temp_day_fwd_rcp60_sel$Temp ~ years_months, data = Temp_day_fwd_rcp60_sel , mean)
+          colnames(Temp_month_fwd_rcp60_sel)=c("Date","Temp")
+          Temp_month_fwd_rcp60_sel$Date<-as.Date(paste(Temp_month_fwd_rcp60_sel$Date, "01", sep = "-"))
+          
+          years_months <- format(Precip_day_fwd_rcp26_sel$Date, "%Y-%m")
+          Precip_month_fwd_rcp26_sel <- aggregate(Precip_day_fwd_rcp26_sel$Precip ~ years_months, data = Precip_day_fwd_rcp26_sel , sum)
+          colnames(Precip_month_fwd_rcp26_sel)=c("Date","Precip")
+          Precip_month_fwd_rcp26_sel$Date<-as.Date(paste(Precip_month_fwd_rcp26_sel$Date, "01", sep = "-"))
+          
+          Precip_month_fwd_rcp60_sel <- aggregate(Precip_day_fwd_rcp60_sel$Precip ~ years_months, data = Precip_day_fwd_rcp60_sel , sum)
+          colnames(Precip_month_fwd_rcp60_sel)=c("Date","Precip")
+          Precip_month_fwd_rcp60_sel$Date<-as.Date(paste(Precip_month_fwd_rcp60_sel$Date, "01", sep = "-"))
+          
+          years_months <- format(Vswc_day_fwd_rcp26_sel$Date, "%Y-%m")
+          Vswc_month_fwd_rcp26_sel <- aggregate(Vswc_day_fwd_rcp26_sel$Vswc ~ years_months, data = Vswc_day_fwd_rcp26_sel , mean)
+          colnames(Vswc_month_fwd_rcp26_sel)=c("Date","Vswc")
+          Vswc_month_fwd_rcp26_sel$Date<-as.Date(paste(Vswc_month_fwd_rcp26_sel$Date, "01", sep = "-"))
+          
+          Vswc_month_fwd_rcp60_sel <- aggregate(Vswc_day_fwd_rcp60_sel$Vswc ~ years_months, data = Vswc_day_fwd_rcp60_sel , mean)
+          colnames(Vswc_month_fwd_rcp60_sel)=c("Date","Vswc")
+          Vswc_month_fwd_rcp60_sel$Date<-as.Date(paste(Vswc_month_fwd_rcp60_sel$Date, "01", sep = "-"))
+          
+          
+          # Each time through the loop, add another row of data. This is
+          # a stand-in for a long-running computation.
+          dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+          
+          # Increment the progress bar, and update the detail text.
+          i_progr<-i_progr+1
+          incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+          
+          
+          min_temp <- min(as.numeric(cbind(Temp_month_fwd_rcp26_sel$Temp,
+                                           Temp_month_fwd_rcp60_sel$Temp,
+                                           Temp_month$Temp)))
+          max_temp <- max(as.numeric(cbind(Temp_month_fwd_rcp26_sel$Temp,
+                                           Temp_month_fwd_rcp60_sel$Temp,
+                                           Temp_month$Temp)))
+          
+          min_prec <- min(as.numeric(cbind(Precip_month_fwd_rcp26_sel$Precip,
+                                           Precip_month_fwd_rcp60_sel$Precip,
+                                           Precip_month$Precip)))
+          max_prec <- max(as.numeric(cbind(Precip_month_fwd_rcp26_sel$Precip,
+                                           Precip_month_fwd_rcp60_sel$Precip,
+                                           Precip_month$Precip)))
+          
+          min_potevap <- min(as.numeric(cbind(Potevap_month_fwd_rcp26_sel$Potevap,
+                                              Potevap_month_fwd_rcp60_sel$Potevap,
+                                              Potevap_month$Potevap)))
+          max_potevap <- max(as.numeric(cbind(Potevap_month_fwd_rcp26_sel$Potevap,
+                                              Potevap_month_fwd_rcp60_sel$Potevap,
+                                              Potevap_month$Potevap)))
+          
+          min_vswc <- min(as.numeric(cbind(Vswc_month_fwd_rcp26_sel$Vswc,
+                                           Vswc_month_fwd_rcp60_sel$Vswc,
+                                           Vswc_month$Vswc)))
+          max_vswc <- max(as.numeric(cbind(Vswc_month_fwd_rcp26_sel$Vswc,
+                                           Vswc_month_fwd_rcp60_sel$Vswc,
+                                           Vswc_month$Vswc)))
+          #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<#
+          #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<#
+          
+          
+          ####################
+          #PLOT CLIMATE
+          ###################
+          par(mfrow=c(2,2),mar=c(4, 5, 5, 3))
+          #par(mfrow=c(4,1),mar=c(4, 5, 4, 1),cex = 1.5)
+          cex_clim = 1.5
+          #Plot climate variables
+          
+          
+          plot(Temp_month_fwd_rcp26_sel$Date,Temp_month_fwd_rcp26_sel$Temp,type="l", 
+               ylab="˚C",xlab="Years",col="blue",cex.lab=cex_clim,cex.axis=cex_clim,cex.main=cex_clim,
+               main="Temperature",ylim=c(min_temp-2,max_temp+2))
+          lines(Temp_month_fwd_rcp60_sel$Date,Temp_month_fwd_rcp60_sel$Temp,col="red")
+          lines(Temp_month$Date,Temp_month$Temp,col="black")
+          
+          legend("bottomright", c("RCP 2.6", "RCP 6.0","User"),
+                 lty=1,lwd=c(3,3), col=c("blue","red","black"), cex=1.2,inset=c(-0.05,1.3),xpd=TRUE, horiz=TRUE,bty="n")
+          
+          plot(Precip_month_fwd_rcp26_sel$Date,Precip_month_fwd_rcp26_sel$Precip,type="l", 
+               ylab=expression("mm"~{month}^{-1}~" "),xlab="Years",col="blue",cex.lab=cex_clim,cex.axis=cex_clim,cex.main=cex_clim,
+               main="Precipitation",ylim=c(min_prec-2,max_prec+2))
+          lines(Precip_month_fwd_rcp60_sel$Date,Precip_month_fwd_rcp60_sel$Precip,col="red")
+          lines(Precip_month$Date,Precip_month$Precip,col="black")
+          
+          plot(Vswc_month_fwd_rcp26_sel$Date,Vswc_month_fwd_rcp26_sel$Vswc,type="l", 
+               ylab=expression(" "~{mm}^{3}~{mm}^{-3}~" "),xlab="Years",col="blue",cex.lab=cex_clim,cex.axis=cex_clim,cex.main=cex_clim,
+               main="Soil moisture",ylim=c(min_vswc-0.02,max_vswc+0.02))
+          lines(Vswc_month_fwd_rcp60_sel$Date,Vswc_month_fwd_rcp60_sel$Vswc,col="red")
+          lines(Vswc_month$Date,Vswc_month$Vswc,type="l",col="black")
+          
+          
+          plot(Potevap_month_fwd_rcp26_sel$Date,Potevap_month_fwd_rcp26_sel$Potevap,type="l", 
+               ylab=expression("mm"~{month}^{-1}~" "),xlab="Years",col="blue",cex.lab=cex_clim,cex.axis=cex_clim,cex.main=cex_clim,
+               main="Potential evapotranspiration",ylim=c(min_potevap-2,max_potevap+2))
+          lines(Potevap_month_fwd_rcp60_sel$Date,Potevap_month_fwd_rcp60_sel$Potevap,col="red")  
+          lines(Potevap_month$Date,Potevap_month$Potevap,col="black")
+          
+          
+          # Each time through the loop, add another row of data. This is
+          # a stand-in for a long-running computation.
+          dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+          
+          # Increment the progress bar, and update the detail text.
+          i_progr<-i_progr+1
+          incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+          
+        }else{
+          
+          print("NO user climate data, only ISIMIP")
+          
+          
+          
+          #Run retreive_clim_data_site function to retrieve climate data for site
+          #data_clim = retreive_clim_data_site()
+          
+          
+          data_clim_potevap<-retreive_clim_data_site_potevap()
+          #Potevap_month_spinup_rcp26=retreive_clim_data_site_potevap()[[1]]
+          Potevap_month_fwd_rcp26_sel=data_clim_potevap[[2]]
+          Potevap_month_fwd_rcp60_sel=data_clim_potevap[[3]]
+          
+          # Each time through the loop, add another row of data. This is
+          # a stand-in for a long-running computation.
+          dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+          
+          # Increment the progress bar, and update the detail text.
+          i_progr<-i_progr+1
+          incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+          
+          data_clim_precip<-retreive_clim_data_site_precip()
+          #Precip_day_spinup=data_clim_precip[[1]]
+          Precip_day_fwd_rcp26_sel=data_clim_precip[[2]]
+          Precip_day_fwd_rcp60_sel=data_clim_precip[[3]]
+          
+          # Each time through the loop, add another row of data. This is
+          # a stand-in for a long-running computation.
+          dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+          
+          # Increment the progress bar, and update the detail text.
+          i_progr<-i_progr+1
+          incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+          
+          data_clim_temp<-retreive_clim_data_site_temp()
+          #Temp_day_spinup=data_clim_temp[[1]]
+          Temp_day_fwd_rcp26_sel=data_clim_temp[[2]]
+          Temp_day_fwd_rcp60_sel=data_clim_temp[[3]]
+          
+          # Each time through the loop, add another row of data. This is
+          # a stand-in for a long-running computation.
+          dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+          
+          # Increment the progress bar, and update the detail text.
+          i_progr<-i_progr+1
+          incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+          
+          data_clim_vswc<-retreive_clim_data_site_vswc()
+          #Vswc_day_spinup=data_clim_vswc[[1]]
+          Vswc_day_fwd_rcp26_sel=data_clim_vswc[[2]]
+          Vswc_day_fwd_rcp60_sel=data_clim_vswc[[3]]
+          
+          # Each time through the loop, add another row of data. This is
+          # a stand-in for a long-running computation.
+          dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+          
+          # Increment the progress bar, and update the detail text.
+          i_progr<-i_progr+1
+          incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+          
+          #Convert daily variables to monthly for plots
+          years_months <- format(Temp_day_fwd_rcp26_sel$Date, "%Y-%m")
+          Temp_month_fwd_rcp26_sel <- aggregate(Temp_day_fwd_rcp26_sel$Temp ~ years_months, data = Temp_day_fwd_rcp26_sel , mean)
+          colnames(Temp_month_fwd_rcp26_sel)=c("Date","Temp")
+          Temp_month_fwd_rcp26_sel$Date<-as.Date(paste(Temp_month_fwd_rcp26_sel$Date, "01", sep = "-"))
+          
+          Temp_month_fwd_rcp60_sel <- aggregate(Temp_day_fwd_rcp60_sel$Temp ~ years_months, data = Temp_day_fwd_rcp60_sel , mean)
+          colnames(Temp_month_fwd_rcp60_sel)=c("Date","Temp")
+          Temp_month_fwd_rcp60_sel$Date<-as.Date(paste(Temp_month_fwd_rcp60_sel$Date, "01", sep = "-"))
+          
+          years_months <- format(Precip_day_fwd_rcp26_sel$Date, "%Y-%m")
+          Precip_month_fwd_rcp26_sel <- aggregate(Precip_day_fwd_rcp26_sel$Precip ~ years_months, data = Precip_day_fwd_rcp26_sel , sum)
+          colnames(Precip_month_fwd_rcp26_sel)=c("Date","Precip")
+          Precip_month_fwd_rcp26_sel$Date<-as.Date(paste(Precip_month_fwd_rcp26_sel$Date, "01", sep = "-"))
+          
+          Precip_month_fwd_rcp60_sel <- aggregate(Precip_day_fwd_rcp60_sel$Precip ~ years_months, data = Precip_day_fwd_rcp60_sel , sum)
+          colnames(Precip_month_fwd_rcp60_sel)=c("Date","Precip")
+          Precip_month_fwd_rcp60_sel$Date<-as.Date(paste(Precip_month_fwd_rcp60_sel$Date, "01", sep = "-"))
+          
+          years_months <- format(Vswc_day_fwd_rcp26_sel$Date, "%Y-%m")
+          Vswc_month_fwd_rcp26_sel <- aggregate(Vswc_day_fwd_rcp26_sel$Vswc ~ years_months, data = Vswc_day_fwd_rcp26_sel , mean)
+          colnames(Vswc_month_fwd_rcp26_sel)=c("Date","Vswc")
+          Vswc_month_fwd_rcp26_sel$Date<-as.Date(paste(Vswc_month_fwd_rcp26_sel$Date, "01", sep = "-"))
+          
+          Vswc_month_fwd_rcp60_sel <- aggregate(Vswc_day_fwd_rcp60_sel$Vswc ~ years_months, data = Vswc_day_fwd_rcp60_sel , mean)
+          colnames(Vswc_month_fwd_rcp60_sel)=c("Date","Vswc")
+          Vswc_month_fwd_rcp60_sel$Date<-as.Date(paste(Vswc_month_fwd_rcp60_sel$Date, "01", sep = "-"))
+          
+          #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<#
+          #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<#
+          
+          # Each time through the loop, add another row of data. This is
+          # a stand-in for a long-running computation.
+          dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+          
+          # Increment the progress bar, and update the detail text.
+          i_progr<-i_progr+1
+          incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+          
+          ####################
+          #PLOT CLIMATE
+          ###################
+          par(mfrow=c(2,2),mar=c(4, 5, 5, 3))
+          #par(mfrow=c(4,1),mar=c(4, 5, 4, 1),cex = 1.5)
+          cex_clim = 1.5
+          #Plot climate variables
+          
+          plot(Temp_month_fwd_rcp26_sel$Date,Temp_month_fwd_rcp26_sel$Temp,type="l", 
+               ylab="˚C",xlab="Years",col="blue",cex.lab=cex_clim,cex.axis=cex_clim,cex.main=cex_clim,
+               main="Temperature")
+          lines(Temp_month_fwd_rcp60_sel$Date,Temp_month_fwd_rcp60_sel$Temp,col="red")
+          
+          legend("bottomright", c("RCP 2.6", "RCP 6.0"),
+                 lty=1,lwd=c(3,3), col=c("blue","red"), cex=1.5,inset=c(0,1.3),xpd=TRUE, horiz=TRUE,bty="n")
+          
+          plot(Precip_month_fwd_rcp26_sel$Date,Precip_month_fwd_rcp26_sel$Precip,type="l", 
+               ylab=expression("mm"~{month}^{-1}~" "),xlab="Years",col="blue",cex.lab=cex_clim,cex.axis=cex_clim,cex.main=cex_clim,
+               main="Precipitation")
+          lines(Precip_month_fwd_rcp60_sel$Date,Precip_month_fwd_rcp60_sel$Precip,col="red")
+          
+          plot(Vswc_month_fwd_rcp26_sel$Date,Vswc_month_fwd_rcp26_sel$Vswc,type="l", 
+               ylab=expression(" "~{mm}^{3}~{mm}^{-3}~" "),xlab="Years",col="blue",cex.lab=cex_clim,cex.axis=cex_clim,cex.main=cex_clim,
+               main="Soil moisture")
+          lines(Vswc_month_fwd_rcp60_sel$Date,Vswc_month_fwd_rcp60_sel$Vswc,col="red")
+          
+          plot(Potevap_month_fwd_rcp26_sel$Date,Potevap_month_fwd_rcp26_sel$Potevap,type="l", 
+               ylab=expression("mm"~{month}^{-1}~" "),xlab="Years",col="blue",cex.lab=cex_clim,cex.axis=cex_clim,cex.main=cex_clim,
+               main="Potential evapotranspiration")
+          lines(Potevap_month_fwd_rcp60_sel$Date,Potevap_month_fwd_rcp60_sel$Potevap,col="red")  
+          
+          # Each time through the loop, add another row of data. This is
+          # a stand-in for a long-running computation.
+          dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+          
+          # Increment the progress bar, and update the detail text.
+          i_progr<-i_progr+1
+          incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+          
+        }
+        
+        
+      })
       
-      #If these variables are set to true, it means that the user has input climate data
-      #Then we plot both the user and ISIMIP data together
-      if((values$set_temp_user_data & 
-          values$set_prec_user_data &
-          values$set_potevap_user_data &
-          values$set_vswc_user_data)){
-        
-        print("plotting both user and isimip data together")
-        
-        ##################
-        ### USERD DATA ##
-        ##################
-        #Convert daily variables to monthly for plots
-        years_months <- format(Temp_day$Date, "%Y-%m")
-        Temp_month <- aggregate(Temp_day$Temp ~ years_months, data = Temp_day , mean)
-        colnames(Temp_month)=c("Date","Temp")
-        Temp_month$Date<-as.Date(paste(Temp_month$Date, "01", sep = "-"))
-        
-        years_months <- format(Precip_day$Date, "%Y-%m")
-        Precip_month <- aggregate(Precip_day$Precip ~ years_months, data = Precip_day , sum)
-        colnames(Precip_month)=c("Date","Precip")
-        Precip_month$Date<-as.Date(paste(Precip_month$Date, "01", sep = "-"))
-        
-        years_months <- format(Vswc_day$Date, "%Y-%m")
-        Vswc_month <- aggregate(Vswc_day$Vswc ~ years_months, data = Vswc_day , mean)
-        colnames(Vswc_month)=c("Date","Vswc")
-        Vswc_month$Date<-as.Date(paste(Vswc_month$Date, "01", sep = "-"))
-        
-        
-        ##################
-        ### ISIMIP DATA ##
-        ##################
-        
-        #Run retreive_clim_data_site function to retrieve climate data for site
-        data_clim = retreive_clim_data_site()
-        #Potevap_month_spinup_rcp26=data_clim[[1]]
-        Potevap_month_fwd_rcp26_sel=data_clim[[2]]
-        Potevap_month_fwd_rcp60_sel=data_clim[[3]]
-        #Precip_day_spinup=data_clim[[4]]
-        Precip_day_fwd_rcp26_sel=data_clim[[5]]
-        Precip_day_fwd_rcp60_sel=data_clim[[6]]
-        #Temp_day_spinup=data_clim[[7]]
-        Temp_day_fwd_rcp26_sel=data_clim[[8]]
-        Temp_day_fwd_rcp60_sel=data_clim[[9]]
-        #Vswc_day_spinup=data_clim[[10]]
-        Vswc_day_fwd_rcp26_sel=data_clim[[11]]
-        Vswc_day_fwd_rcp60_sel=data_clim[[12]]
-        
-        #Convert daily variables to monthly for plots
-        years_months <- format(Temp_day_fwd_rcp26_sel$Date, "%Y-%m")
-        Temp_month_fwd_rcp26_sel <- aggregate(Temp_day_fwd_rcp26_sel$Temp ~ years_months, data = Temp_day_fwd_rcp26_sel , mean)
-        colnames(Temp_month_fwd_rcp26_sel)=c("Date","Temp")
-        Temp_month_fwd_rcp26_sel$Date<-as.Date(paste(Temp_month_fwd_rcp26_sel$Date, "01", sep = "-"))
-        
-        Temp_month_fwd_rcp60_sel <- aggregate(Temp_day_fwd_rcp60_sel$Temp ~ years_months, data = Temp_day_fwd_rcp60_sel , mean)
-        colnames(Temp_month_fwd_rcp60_sel)=c("Date","Temp")
-        Temp_month_fwd_rcp60_sel$Date<-as.Date(paste(Temp_month_fwd_rcp60_sel$Date, "01", sep = "-"))
-        
-        years_months <- format(Precip_day_fwd_rcp26_sel$Date, "%Y-%m")
-        Precip_month_fwd_rcp26_sel <- aggregate(Precip_day_fwd_rcp26_sel$Precip ~ years_months, data = Precip_day_fwd_rcp26_sel , sum)
-        colnames(Precip_month_fwd_rcp26_sel)=c("Date","Precip")
-        Precip_month_fwd_rcp26_sel$Date<-as.Date(paste(Precip_month_fwd_rcp26_sel$Date, "01", sep = "-"))
-        
-        Precip_month_fwd_rcp60_sel <- aggregate(Precip_day_fwd_rcp60_sel$Precip ~ years_months, data = Precip_day_fwd_rcp60_sel , sum)
-        colnames(Precip_month_fwd_rcp60_sel)=c("Date","Precip")
-        Precip_month_fwd_rcp60_sel$Date<-as.Date(paste(Precip_month_fwd_rcp60_sel$Date, "01", sep = "-"))
-        
-        years_months <- format(Vswc_day_fwd_rcp26_sel$Date, "%Y-%m")
-        Vswc_month_fwd_rcp26_sel <- aggregate(Vswc_day_fwd_rcp26_sel$Vswc ~ years_months, data = Vswc_day_fwd_rcp26_sel , mean)
-        colnames(Vswc_month_fwd_rcp26_sel)=c("Date","Vswc")
-        Vswc_month_fwd_rcp26_sel$Date<-as.Date(paste(Vswc_month_fwd_rcp26_sel$Date, "01", sep = "-"))
-        
-        Vswc_month_fwd_rcp60_sel <- aggregate(Vswc_day_fwd_rcp60_sel$Vswc ~ years_months, data = Vswc_day_fwd_rcp60_sel , mean)
-        colnames(Vswc_month_fwd_rcp60_sel)=c("Date","Vswc")
-        Vswc_month_fwd_rcp60_sel$Date<-as.Date(paste(Vswc_month_fwd_rcp60_sel$Date, "01", sep = "-"))
-        
-        
-        min_temp <- min(as.numeric(cbind(Temp_month_fwd_rcp26_sel$Temp,
-                                         Temp_month_fwd_rcp60_sel$Temp,
-                                         Temp_month$Temp)))
-        max_temp <- max(as.numeric(cbind(Temp_month_fwd_rcp26_sel$Temp,
-                                         Temp_month_fwd_rcp60_sel$Temp,
-                                         Temp_month$Temp)))
-        
-        min_prec <- min(as.numeric(cbind(Precip_month_fwd_rcp26_sel$Precip,
-                                         Precip_month_fwd_rcp60_sel$Precip,
-                                         Precip_month$Precip)))
-        max_prec <- max(as.numeric(cbind(Precip_month_fwd_rcp26_sel$Precip,
-                                         Precip_month_fwd_rcp60_sel$Precip,
-                                         Precip_month$Precip)))
-        
-        min_potevap <- min(as.numeric(cbind(Potevap_month_fwd_rcp26_sel$Potevap,
-                                            Potevap_month_fwd_rcp60_sel$Potevap,
-                                            Potevap_month$Potevap)))
-        max_potevap <- max(as.numeric(cbind(Potevap_month_fwd_rcp26_sel$Potevap,
-                                            Potevap_month_fwd_rcp60_sel$Potevap,
-                                            Potevap_month$Potevap)))
-        
-        min_vswc <- min(as.numeric(cbind(Vswc_month_fwd_rcp26_sel$Vswc,
-                                         Vswc_month_fwd_rcp60_sel$Vswc,
-                                         Vswc_month$Vswc)))
-        max_vswc <- max(as.numeric(cbind(Vswc_month_fwd_rcp26_sel$Vswc,
-                                         Vswc_month_fwd_rcp60_sel$Vswc,
-                                         Vswc_month$Vswc)))
-        #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<#
-        #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<#
-        
-        
-        ####################
-        #PLOT CLIMATE
-        ###################
-        par(mfrow=c(2,2),mar=c(4, 5, 5, 3))
-        #par(mfrow=c(4,1),mar=c(4, 5, 4, 1),cex = 1.5)
-        cex_clim = 1.5
-        #Plot climate variables
-        
-        
-        plot(Temp_month_fwd_rcp26_sel$Date,Temp_month_fwd_rcp26_sel$Temp,type="l", 
-             ylab="˚C",xlab="Years",col="blue",cex.lab=cex_clim,cex.axis=cex_clim,cex.main=cex_clim,
-             main="Temperature",ylim=c(min_temp-2,max_temp+2))
-        lines(Temp_month_fwd_rcp60_sel$Date,Temp_month_fwd_rcp60_sel$Temp,col="red")
-        lines(Temp_month$Date,Temp_month$Temp,col="black")
-        
-        legend("bottomright", c("RCP 2.6", "RCP 6.0","User"),
-               lty=1,lwd=c(3,3), col=c("blue","red","black"), cex=1.2,inset=c(-0.05,1.3),xpd=TRUE, horiz=TRUE,bty="n")
-        
-        plot(Precip_month_fwd_rcp26_sel$Date,Precip_month_fwd_rcp26_sel$Precip,type="l", 
-             ylab=expression("mm"~{month}^{-1}~" "),xlab="Years",col="blue",cex.lab=cex_clim,cex.axis=cex_clim,cex.main=cex_clim,
-             main="Precipitation",ylim=c(min_prec-2,max_prec+2))
-        lines(Precip_month_fwd_rcp60_sel$Date,Precip_month_fwd_rcp60_sel$Precip,col="red")
-        lines(Precip_month$Date,Precip_month$Precip,col="black")
-        
-        plot(Vswc_month_fwd_rcp26_sel$Date,Vswc_month_fwd_rcp26_sel$Vswc,type="l", 
-             ylab=expression(" "~{mm}^{3}~{mm}^{-3}~" "),xlab="Years",col="blue",cex.lab=cex_clim,cex.axis=cex_clim,cex.main=cex_clim,
-             main="Soil moisture",ylim=c(min_vswc-0.02,max_vswc+0.02))
-        lines(Vswc_month_fwd_rcp60_sel$Date,Vswc_month_fwd_rcp60_sel$Vswc,col="red")
-        lines(Vswc_month$Date,Vswc_month$Vswc,type="l",col="black")
-        
-        
-        plot(Potevap_month_fwd_rcp26_sel$Date,Potevap_month_fwd_rcp26_sel$Potevap,type="l", 
-             ylab=expression("mm"~{month}^{-1}~" "),xlab="Years",col="blue",cex.lab=cex_clim,cex.axis=cex_clim,cex.main=cex_clim,
-             main="Potential evapotranspiration",ylim=c(min_potevap-2,max_potevap+2))
-        lines(Potevap_month_fwd_rcp60_sel$Date,Potevap_month_fwd_rcp60_sel$Potevap,col="red")  
-        lines(Potevap_month$Date,Potevap_month$Potevap,col="black")
-        
-        
-      }else{
-        
-        print("NO user climate data, only ISIMIP")
-        
-        #Run retreive_clim_data_site function to retrieve climate data for site
-        data_clim = retreive_clim_data_site()
-        #Potevap_month_spinup_rcp26=data_clim[[1]]
-        Potevap_month_fwd_rcp26_sel=data_clim[[2]]
-        Potevap_month_fwd_rcp60_sel=data_clim[[3]]
-        #Precip_day_spinup=data_clim[[4]]
-        Precip_day_fwd_rcp26_sel=data_clim[[5]]
-        Precip_day_fwd_rcp60_sel=data_clim[[6]]
-        #Temp_day_spinup=data_clim[[7]]
-        Temp_day_fwd_rcp26_sel=data_clim[[8]]
-        Temp_day_fwd_rcp60_sel=data_clim[[9]]
-        #Vswc_day_spinup=data_clim[[10]]
-        Vswc_day_fwd_rcp26_sel=data_clim[[11]]
-        Vswc_day_fwd_rcp60_sel=data_clim[[12]]
-        
-        
-        #Convert daily variables to monthly for plots
-        years_months <- format(Temp_day_fwd_rcp26_sel$Date, "%Y-%m")
-        Temp_month_fwd_rcp26_sel <- aggregate(Temp_day_fwd_rcp26_sel$Temp ~ years_months, data = Temp_day_fwd_rcp26_sel , mean)
-        colnames(Temp_month_fwd_rcp26_sel)=c("Date","Temp")
-        Temp_month_fwd_rcp26_sel$Date<-as.Date(paste(Temp_month_fwd_rcp26_sel$Date, "01", sep = "-"))
-        
-        Temp_month_fwd_rcp60_sel <- aggregate(Temp_day_fwd_rcp60_sel$Temp ~ years_months, data = Temp_day_fwd_rcp60_sel , mean)
-        colnames(Temp_month_fwd_rcp60_sel)=c("Date","Temp")
-        Temp_month_fwd_rcp60_sel$Date<-as.Date(paste(Temp_month_fwd_rcp60_sel$Date, "01", sep = "-"))
-        
-        years_months <- format(Precip_day_fwd_rcp26_sel$Date, "%Y-%m")
-        Precip_month_fwd_rcp26_sel <- aggregate(Precip_day_fwd_rcp26_sel$Precip ~ years_months, data = Precip_day_fwd_rcp26_sel , sum)
-        colnames(Precip_month_fwd_rcp26_sel)=c("Date","Precip")
-        Precip_month_fwd_rcp26_sel$Date<-as.Date(paste(Precip_month_fwd_rcp26_sel$Date, "01", sep = "-"))
-        
-        Precip_month_fwd_rcp60_sel <- aggregate(Precip_day_fwd_rcp60_sel$Precip ~ years_months, data = Precip_day_fwd_rcp60_sel , sum)
-        colnames(Precip_month_fwd_rcp60_sel)=c("Date","Precip")
-        Precip_month_fwd_rcp60_sel$Date<-as.Date(paste(Precip_month_fwd_rcp60_sel$Date, "01", sep = "-"))
-        
-        years_months <- format(Vswc_day_fwd_rcp26_sel$Date, "%Y-%m")
-        Vswc_month_fwd_rcp26_sel <- aggregate(Vswc_day_fwd_rcp26_sel$Vswc ~ years_months, data = Vswc_day_fwd_rcp26_sel , mean)
-        colnames(Vswc_month_fwd_rcp26_sel)=c("Date","Vswc")
-        Vswc_month_fwd_rcp26_sel$Date<-as.Date(paste(Vswc_month_fwd_rcp26_sel$Date, "01", sep = "-"))
-        
-        Vswc_month_fwd_rcp60_sel <- aggregate(Vswc_day_fwd_rcp60_sel$Vswc ~ years_months, data = Vswc_day_fwd_rcp60_sel , mean)
-        colnames(Vswc_month_fwd_rcp60_sel)=c("Date","Vswc")
-        Vswc_month_fwd_rcp60_sel$Date<-as.Date(paste(Vswc_month_fwd_rcp60_sel$Date, "01", sep = "-"))
-        
-        #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<#
-        #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<#
-        
-        
-        ####################
-        #PLOT CLIMATE
-        ###################
-        par(mfrow=c(2,2),mar=c(4, 5, 5, 3))
-        #par(mfrow=c(4,1),mar=c(4, 5, 4, 1),cex = 1.5)
-        cex_clim = 1.5
-        #Plot climate variables
-        
-        plot(Temp_month_fwd_rcp26_sel$Date,Temp_month_fwd_rcp26_sel$Temp,type="l", 
-             ylab="˚C",xlab="Years",col="blue",cex.lab=cex_clim,cex.axis=cex_clim,cex.main=cex_clim,
-             main="Temperature")
-        lines(Temp_month_fwd_rcp60_sel$Date,Temp_month_fwd_rcp60_sel$Temp,col="red")
-        
-        legend("bottomright", c("RCP 2.6", "RCP 6.0"),
-               lty=1,lwd=c(3,3), col=c("blue","red"), cex=1.5,inset=c(0,1.3),xpd=TRUE, horiz=TRUE,bty="n")
-        
-        plot(Precip_month_fwd_rcp26_sel$Date,Precip_month_fwd_rcp26_sel$Precip,type="l", 
-             ylab=expression("mm"~{month}^{-1}~" "),xlab="Years",col="blue",cex.lab=cex_clim,cex.axis=cex_clim,cex.main=cex_clim,
-             main="Precipitation")
-        lines(Precip_month_fwd_rcp60_sel$Date,Precip_month_fwd_rcp60_sel$Precip,col="red")
-        
-        plot(Vswc_month_fwd_rcp26_sel$Date,Vswc_month_fwd_rcp26_sel$Vswc,type="l", 
-             ylab=expression(" "~{mm}^{3}~{mm}^{-3}~" "),xlab="Years",col="blue",cex.lab=cex_clim,cex.axis=cex_clim,cex.main=cex_clim,
-             main="Soil moisture")
-        lines(Vswc_month_fwd_rcp60_sel$Date,Vswc_month_fwd_rcp60_sel$Vswc,col="red")
-        
-        plot(Potevap_month_fwd_rcp26_sel$Date,Potevap_month_fwd_rcp26_sel$Potevap,type="l", 
-             ylab=expression("mm"~{month}^{-1}~" "),xlab="Years",col="blue",cex.lab=cex_clim,cex.axis=cex_clim,cex.main=cex_clim,
-             main="Potential evapotranspiration")
-        lines(Potevap_month_fwd_rcp60_sel$Date,Potevap_month_fwd_rcp60_sel$Potevap,col="red")   
-      }
+      
       
     })
     
@@ -3297,51 +4178,198 @@ server <- function(input, output,session) {
       #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>#
       print("Retrieving C input data for site")
       
+      #----------------------------------------------------
+      #Read NPP DATA - FIXED LAND USE
+      #----------------------------------------------------
+
+      # ####
+      # USER
+      # ####
+
+      if((file_Cinput_ag_uploaded() & file_Cinput_bg_uploaded())){
+        retreive_Cinput_ag_user=data_Cinput_ag()
+        retreive_Cinput_bg_user=data_Cinput_bg()
+        retreive_Cinput_user = retreive_Cinput_ag_user+retreive_Cinput_bg_user
+        retreive_Cinput_user_mean = mean(retreive_Cinput_user)
+
+        rm(retreive_Cinput_ag_user,retreive_Cinput_bg_user,retreive_Cinput_user)
+      }
       
+      # #####
+      # #RCP26
+      # #####
+      
+      litter_file_rcp26<-nc_open("data/LITTER/npp_average_rcp26_EU_annual_2006_2099_fixed.nc4")
+      #litter_file_rcp26<-nc_open(paste0(temp_file,"/npp_average_rcp26_EU_annual_2006_2099_fixed.nc4"))
+      #----------------------------------------------------
+      #Read lon-lat-time variables
+      lon_litter_rcp26 <- ncvar_get(litter_file_rcp26, varid = "lon")
+      lat_litter_rcp26 <- ncvar_get(litter_file_rcp26, varid = "lat")
+      #Convert time to dates
+      litter_time_rcp26 <- as.Date("1661-1-1") %m+% years(litter_file_rcp26$dim$time$vals)
+      
+      #Retrieve variable for whole time length
+      litter_rcp26_npp <- ncvar_get(litter_file_rcp26, "npp") #kg/m2/sec
+      
+      #convert npp (#kg/m2/sec) to foliar Litterfall carbon with constant coefficient (see Neumann et al., 2018 and Malhi et al., 2011)
+      litter_rcp26_ag <- litter_rcp26_npp*0.34
+      #calculate belowground carbon input with equation from Jonard et al., 2007 fineroot_in (g/m2/yr) =0.333*(1.92*AG_litterfall(g/m2/yr)+130)
+      #where *1000*(60*60*24*365.25) is the conversion factor from kg/m2/sec to (g/m2/yr)
+      litter_rcp26_bg <- 0.333*(1.92*(litter_rcp26_ag*1000*(60*60*24*365.25))+130)/(1000*(60*60*24*365.25)) 
+      # #calculate total litter input (kg/m2/sec)
+      # litter_rcp26<- litter_rcp26_ag+litter_rcp26_bg
       retreive_Cinput_ag_rcp26_fix = retreive_Cinput(lon_litter_rcp26,lat_litter_rcp26,litter_time_rcp26,litter_rcp26_ag)
       retreive_Cinput_bg_rcp26_fix = retreive_Cinput(lon_litter_rcp26,lat_litter_rcp26,litter_time_rcp26,litter_rcp26_bg)
       retreive_Cinput_rcp26_fix = retreive_Cinput_ag_rcp26_fix+retreive_Cinput_bg_rcp26_fix
       retreive_Cinput_rcp26_fix_mean = mean(retreive_Cinput_rcp26_fix)
+      
+      rm(litter_file_rcp26,lon_litter_rcp26,lat_litter_rcp26,litter_time_rcp26,litter_rcp26_ag,litter_rcp26_bg,litter_rcp26_npp)
+      
+      # #####
+      # #RCP60
+      # ##### 
+      litter_file_rcp60<-nc_open("data/LITTER/npp_average_rcp60_EU_annual_2006_2099_fixed.nc4")
+      #litter_file_rcp60<-nc_open(paste0(temp_file,"/npp_average_rcp60_EU_annual_2006_2099_fixed.nc4"))
+      #----------------------------------------------------
+      #Read lon-lat-time variables
+      lon_litter_rcp60 <- ncvar_get(litter_file_rcp60, varid = "lon")
+      lat_litter_rcp60 <- ncvar_get(litter_file_rcp60, varid = "lat")
+      #Convert time to dates
+      litter_time_rcp60 <- as.Date("1661-1-1") %m+% years(litter_file_rcp60$dim$time$vals)
+      # #Convert time to dates
+      # litter_time_plot_rcp60 <- as.Date.character(format(litter_time_rcp60, "%Y-%m-%d"))
+      #Retrieve variable for whole time length
+      litter_rcp60_npp <- ncvar_get(litter_file_rcp60, "npp")
+      
+      #convert npp (#kg/m2/sec) to foliar Litterfall carbon with constant coefficient (see Neumann et al., 2018 and Malhi et al., 2011)
+      litter_rcp60_ag <- litter_rcp60_npp*0.34
+      #calculate belowground carbon input with equation from Jonard et al., 2007 fineroot_in (g/m2/yr) =0.333*(1.92*AG_litterfall(g/m2/yr)+130)
+      #where *1000*(60*60*24*365.25) is the conversion factor from kg/m2/sec to (g/m2/yr)
+      litter_rcp60_bg <- 0.333*(1.92*(litter_rcp60_ag*1000*(60*60*24*365.25))+130)/(1000*(60*60*24*365.25)) 
+      # #calculate total litter input (kg/m2/sec)
+      # litter_rcp60<- litter_rcp60_ag+litter_rcp60_bg
       
       retreive_Cinput_ag_rcp60_fix = retreive_Cinput(lon_litter_rcp60,lat_litter_rcp60,litter_time_rcp60,litter_rcp60_ag)
       retreive_Cinput_bg_rcp60_fix = retreive_Cinput(lon_litter_rcp60,lat_litter_rcp60,litter_time_rcp60,litter_rcp60_bg)
       retreive_Cinput_rcp60_fix=retreive_Cinput_ag_rcp60_fix+retreive_Cinput_bg_rcp60_fix
       retreive_Cinput_rcp60_fix_mean = mean(retreive_Cinput_rcp60_fix)
       
+      rm(litter_file_rcp60,lon_litter_rcp60,lat_litter_rcp60,litter_time_rcp60,litter_rcp60_ag,litter_rcp60_bg,litter_rcp60_npp)
+      
+      #----------------------------------------------------
+      #Read NPP DATA with variable land use
+      #----------------------------------------------------
+      # #####
+      # #RCP26 var
+      # #####
+      
+      litter_LU_file_rcp26<-nc_open("data/LITTER/npp_average_rcp26_EU_annual_2006_2099_var.nc4")
+      #litter_LU_file_rcp26<-nc_open(paste0(temp_file,"/npp_average_rcp26_EU_annual_2006_2099_var.nc4"))
+      #----------------------------------------------------
+      #Read lon-lat-time variables
+      lon_litter_LU_rcp26 <- ncvar_get(litter_LU_file_rcp26, varid = "lon")
+      lat_litter_LU_rcp26 <- ncvar_get(litter_LU_file_rcp26, varid = "lat")
+      #Convert time to dates
+      litter_LU_time_rcp26 <- as.Date("1661-1-1") %m+% years(as.integer(litter_LU_file_rcp26$dim$time$vals))
+      #Convert time to dates
+      #litter_LU_time_plot_rcp26 <- as.Date.character(format(litter_LU_time_rcp26, "%Y-%m-%d"))
+      #Retrieve variable for whole time length
+      litter_LU_rcp26_npp <- ncvar_get(litter_LU_file_rcp26, "npp")
+      
+      #convert npp (#kg/m2/sec) to foliar Litterfall carbon with constant coefficient (see Neumann et al., 2018 and Malhi et al., 2011)
+      litter_LU_rcp26_ag <- litter_LU_rcp26_npp*0.34
+      #calculate belowground carbon input with equation from Jonard et al., 2007 fineroot_in (g/m2/yr) =0.333*(1.92*AG_litterfall(g/m2/yr)+130)
+      #where *1000*(60*60*24*365.25) is the conversion factor from kg/m2/sec to (g/m2/yr)
+      litter_LU_rcp26_bg <- 0.333*(1.92*(litter_LU_rcp26_ag*1000*(60*60*24*365.25))+130)/(1000*(60*60*24*365.25)) 
+      # #calculate total litter input (kg/m2/sec)
+      # litter_LU_rcp26<- litter_LU_rcp26_ag+litter_LU_rcp26_bg
+      
       retreive_Cinput_ag_rcp26_var = retreive_Cinput(lon_litter_LU_rcp26,lat_litter_LU_rcp26,litter_LU_time_rcp26,litter_LU_rcp26_ag)
       retreive_Cinput_bg_rcp26_var = retreive_Cinput(lon_litter_LU_rcp26,lat_litter_LU_rcp26,litter_LU_time_rcp26,litter_LU_rcp26_bg)
       retreive_Cinput_rcp26_var = retreive_Cinput_ag_rcp26_var+retreive_Cinput_bg_rcp26_var
       retreive_Cinput_rcp26_var_mean = mean(retreive_Cinput_rcp26_var)
+      
+      rm(litter_LU_file_rcp26,lon_litter_LU_rcp26,lat_litter_LU_rcp26,litter_LU_time_rcp26,litter_LU_rcp26_ag,litter_LU_rcp26_bg,litter_LU_rcp26_npp)
+      
+      # #####
+      # #RCP60
+      # #####
+      litter_LU_file_rcp60<-nc_open("data/LITTER/npp_average_rcp60_EU_annual_2006_2099_var.nc4")
+      #litter_LU_file_rcp60<-nc_open(paste0(temp_file,"/npp_average_rcp60_EU_annual_2006_2099_var.nc4"))
+      #----------------------------------------------------
+      #Read lon-lat-time variables
+      lon_litter_LU_rcp60 <- ncvar_get(litter_LU_file_rcp60, varid = "lon")
+      lat_litter_LU_rcp60 <- ncvar_get(litter_LU_file_rcp60, varid = "lat")
+      #Convert time to dates
+      litter_LU_time_rcp60 <- as.Date("1661-1-1") %m+% years(as.integer(litter_LU_file_rcp60$dim$time$vals))
+      #Convert time to dates
+      #litter_LU_time_plot_rcp60 <- as.Date.character(format(litter_LU_time_rcp60, "%Y-%m-%d"))
+      #Retrieve variable for whole time length
+      litter_LU_rcp60_npp <- ncvar_get(litter_LU_file_rcp60, "npp")
+      
+      #convert npp (#kg/m2/sec) to foliar Litterfall carbon with constant coefficient (see Neumann et al., 2018 and Malhi et al., 2011)
+      litter_LU_rcp60_ag <- litter_LU_rcp60_npp*0.34
+      #calculate belowground carbon input with equation from Jonard et al., 2007 fineroot_in (g/m2/yr) =0.333*(1.92*AG_litterfall(g/m2/yr)+130)
+      #where *1000*(60*60*24*365.25) is the conversion factor from kg/m2/sec to (g/m2/yr)
+      litter_LU_rcp60_bg <- 0.333*(1.92*(litter_LU_rcp60_ag*1000*(60*60*24*365.25))+130)/(1000*(60*60*24*365.25)) 
+      # #calculate total litter input (kg/m2/sec)
+      # litter_LU_rcp60<- litter_LU_rcp60_ag+litter_LU_rcp60_bg
       
       retreive_Cinput_ag_rcp60_var = retreive_Cinput(lon_litter_LU_rcp60,lat_litter_LU_rcp60,litter_LU_time_rcp60,litter_LU_rcp60_ag)
       retreive_Cinput_bg_rcp60_var = retreive_Cinput(lon_litter_LU_rcp60,lat_litter_LU_rcp60,litter_LU_time_rcp60,litter_LU_rcp60_bg)
       retreive_Cinput_rcp60_var = retreive_Cinput_ag_rcp60_var+retreive_Cinput_bg_rcp60_var
       retreive_Cinput_rcp60_var_mean = mean(retreive_Cinput_rcp60_var)
       
-      #Put together
-      Cinput_tog_fix = c(retreive_Cinput_rcp26_fix_mean,retreive_Cinput_rcp60_fix_mean)
-      Cinput_tog_var = c(retreive_Cinput_rcp26_var_mean, retreive_Cinput_rcp60_var_mean)
-      
+      rm(litter_LU_file_rcp60,lon_litter_LU_rcp60,lat_litter_LU_rcp60,litter_LU_time_rcp60,litter_LU_rcp60_ag,litter_LU_rcp60_bg,litter_LU_rcp60_npp)
+     
+
       #Plot bars
-      
       par(mfrow=c(1,2),mar=c(4, 5, 4, 3),cex = 1.5)
-      
-      barplot(Cinput_tog_fix,
-              main = "Fixed land-use",
-              xlab = "Climate scenarios",
-              ylab = expression("Average C input (MgC"~{ha}^{-1}~{yr}^{-1}~")"),
-              names.arg = c("RCP 2.6", "RCP 6.0"),
-              col = c("darkred","blue"),
-              horiz = FALSE)
-      
-      barplot(Cinput_tog_var,
-              main = "Varying land-use",
-              xlab = "Climate scenarios",
-              ylab = expression("Average C input (MgC"~{ha}^{-1}~{yr}^{-1}~")"),
-              names.arg = c("RCP 2.6 ", "RCP 6.0"),
-              col = c("darkred","blue"),
-              horiz = FALSE)
-      
+
+      if((file_Cinput_ag_uploaded() & file_Cinput_bg_uploaded())){
+        Cinput_tog_fix = c(retreive_Cinput_user_mean,retreive_Cinput_rcp26_fix_mean,retreive_Cinput_rcp60_fix_mean)
+        Cinput_tog_var = c(retreive_Cinput_rcp26_var_mean, retreive_Cinput_rcp60_var_mean)
+        barplot(Cinput_tog_fix,
+                main = "Fixed land-use",
+                xlab = "Climate scenarios",
+                ylab = expression("Average C input (MgC"~{ha}^{-1}~{yr}^{-1}~")"),
+                names.arg = c("User","RCP 2.6", "RCP 6.0"),
+                col = c("black","darkred","blue"),
+                horiz = FALSE,
+                cex.names = 0.7)
+        
+        barplot(Cinput_tog_var,
+                main = "Varying land-use",
+                xlab = "Climate scenarios",
+                ylab = expression("Average C input (MgC"~{ha}^{-1}~{yr}^{-1}~")"),
+                names.arg = c("RCP 2.6 ", "RCP 6.0"),
+                col = c("darkred","blue"),
+                horiz = FALSE,
+                cex.names = 0.7)
+      }else{
+        
+        #Put together
+        Cinput_tog_fix = c(retreive_Cinput_rcp26_fix_mean,retreive_Cinput_rcp60_fix_mean)
+        Cinput_tog_var = c(retreive_Cinput_rcp26_var_mean, retreive_Cinput_rcp60_var_mean)
+        
+        barplot(Cinput_tog_fix,
+                main = "Fixed land-use",
+                xlab = "Climate scenarios",
+                ylab = expression("Average C input (MgC"~{ha}^{-1}~{yr}^{-1}~")"),
+                names.arg = c("RCP 2.6", "RCP 6.0"),
+                col = c("darkred","blue"),
+                horiz = FALSE,
+                cex.names = 0.7)
+        
+        barplot(Cinput_tog_var,
+                main = "Varying land-use",
+                xlab = "Climate scenarios",
+                ylab = expression("Average C input (MgC"~{ha}^{-1}~{yr}^{-1}~")"),
+                names.arg = c("RCP 2.6 ", "RCP 6.0"),
+                col = c("darkred","blue"),
+                horiz = FALSE,
+                cex.names = 0.7)
+      }      
       
       
     })
@@ -3394,12 +4422,12 @@ server <- function(input, output,session) {
       #Control scenario
       plot(yearly_dates,retreive_Cinput_rcp26_fix,type="l",col="black",lwd=3,
            xlab="Years",ylab=expression("C input (MgC"~{ha}^{-1}~{yr}^{-1}~")"),
-           ylim=c(min_cin,max_cin),main="Land management",
+           ylim=c(0,max_cin),
            cex.lab=cex_clim,cex.axis=cex_clim,cex.main=1.5)
-      lines(yearly_dates,Cinput_disturbance,type="l",col="darkgreen",lwd=3)
+      lines(yearly_dates,Cinput_disturbance,type="l",col="#00b159",lwd=3)
       
       legend("bottomleft", c("Control","Disturbance"),
-             lty=1,lwd=c(3,3), col=c("black","darkgreen"), cex=cex_clim,inset=c(0,0.97),
+             lty=1,lwd=c(3,3), col=c("black","#00b159"), cex=cex_clim,inset=c(0,0.97),
              xpd=TRUE, horiz=TRUE,bty="n")
       
       # Add text at x = text_at
@@ -3457,7 +4485,7 @@ server <- function(input, output,session) {
     
   })
   
-
+  
   
   #####################
   # REactives for simulations
@@ -3994,297 +5022,429 @@ server <- function(input, output,session) {
   #---------------------------------------------------------------------------------
   output$simulations_fixedLU<- renderPlot({
     req(input$clay_slider)
-    print(" ")
-    print("####################################################")
-    print("####################################################")
-    print("Entering simulations_fixedLU")
-    print("####################################################")
-    print("####################################################")
-    #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>#
-    #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>#
-    #Run retreive_clim_data_site function to retrieve climate data for site
-    print("Retrieving climate data for site for climate scenarios")
-    data_clim = retreive_clim_data_site()
-    # Potevap_month_spinup_rcp26=data_clim[[1]]
-    # Potevap_month_fwd_rcp26=data_clim[[13]]
-    # Potevap_month_fwd_rcp60=data_clim[[14]]
-    # Precip_day_spinup=data_clim[[4]]
-    # Precip_day_fwd_rcp26=data_clim[[15]]
-    # Precip_day_fwd_rcp60=data_clim[[16]]
-    # Temp_day_spinup=data_clim[[7]]
-    # Temp_day_fwd_rcp26=data_clim[[17]]
-    # Temp_day_fwd_rcp60=data_clim[[18]]
-    # Vswc_day_spinup=data_clim[[10]]
-    # Vswc_day_fwd_rcp26=data_clim[[19]]
-    # Vswc_day_fwd_rcp60=data_clim[[20]]
     
-    Potevap_month_spinup_rcp26=data_clim[[1]]
-    Potevap_month_fwd_rcp26_sel=data_clim[[2]]
-    Potevap_month_fwd_rcp60_sel=data_clim[[3]]
-    Precip_day_spinup=data_clim[[4]]
-    Precip_day_fwd_rcp26_sel=data_clim[[5]]
-    Precip_day_fwd_rcp60_sel=data_clim[[6]]
-    Temp_day_spinup=data_clim[[7]]
-    Temp_day_fwd_rcp26_sel=data_clim[[8]]
-    Temp_day_fwd_rcp60_sel=data_clim[[9]]
-    Vswc_day_spinup=data_clim[[10]]
-    Vswc_day_fwd_rcp26_sel=data_clim[[11]]
-    Vswc_day_fwd_rcp60_sel=data_clim[[12]]
-    #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<#
-    #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<#
-    
-    #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>#
-    #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>#
-    #Run retreive_Cinput function to retrieve Cinput for climate scenarios
-    print(" ")
-    print("Retrieving C input data for site")
-    retreive_Cinput_ag_rcp26_fix = retreive_Cinput(lon_litter_rcp26,lat_litter_rcp26,litter_time_rcp26,litter_rcp26_ag)
-    retreive_Cinput_bg_rcp26_fix = retreive_Cinput(lon_litter_rcp26,lat_litter_rcp26,litter_time_rcp26,litter_rcp26_bg)
-    retreive_Cinput_rcp26_fix = retreive_Cinput_ag_rcp26_fix+retreive_Cinput_bg_rcp26_fix
-    
-    retreive_Cinput_ag_rcp60_fix = retreive_Cinput(lon_litter_rcp60,lat_litter_rcp60,litter_time_rcp60,litter_rcp60_ag)
-    retreive_Cinput_bg_rcp60_fix = retreive_Cinput(lon_litter_rcp60,lat_litter_rcp60,litter_time_rcp60,litter_rcp60_bg)
-    retreive_Cinput_rcp60_fix=retreive_Cinput_ag_rcp60_fix+retreive_Cinput_bg_rcp60_fix
-    
-    AWEN_input = c(as.numeric(input$A_pool),
-                   as.numeric(input$W_pool),
-                   as.numeric(input$E_pool),
-                   as.numeric(input$N_pool),
-                   0)
-    
-    #Suppose W and E litter compounds are more labile
-    decomposable_plant_material <-as.numeric(input$W_pool)+as.numeric(input$E_pool)
-    #Suppose A and N litter compounds are more resistant
-    resistant_plant_material <-as.numeric(input$A_pool)+as.numeric(input$N_pool)
-    #Decomposable to resistant ratio
-    DR_in = decomposable_plant_material/resistant_plant_material
-    
-    
-    #CHANGE
-    computation_time_step_fwd = 1
-    #simulation_length_CCscenario = length(Potevap_month_fwd_rcp26$Date)/12
-    simulation_length_CCscenario = simulation_length()
-    
-    ######
-    print("####################################################")
-    print("Preparing to run RCP26")
-    print("####################################################")
-    ######
-    test_mmRCP26 <-Call_MULTIMODEL_i1(plot_figures=plot_figures,simulation_length=simulation_length_CCscenario, spinup_length=spinup_length,
-                                      computation_time_step_fwd=computation_time_step_fwd,
-                                      start_date_simulations=dates_in(),
-                                      temperature_spinup=Temp_day_spinup, precipitation_spinup=Precip_day_spinup, potential_evapotranspiration_spinup=Potevap_month_spinup_rcp26,
-                                      soilmoisture_spinup=as.numeric(Vswc_day_spinup$Vswc),
-                                      temperature_fwd=Temp_day_fwd_rcp26_sel, precipitation_fwd=Precip_day_fwd_rcp26_sel, potential_evapotranspiration_fwd=Potevap_month_fwd_rcp26_sel,soilmoisture_fwd=as.numeric(Vswc_day_fwd_rcp26_sel$Vswc),
-                                      SOC_0=input$SOC,
-                                      C_input_ag_spinup=as.numeric(mean(retreive_Cinput_ag_rcp26_fix)),C_input_bg_spinup=as.numeric(mean(retreive_Cinput_bg_rcp26_fix)),
-                                      C_input_ag_fwd=as.numeric(retreive_Cinput_ag_rcp26_fix),C_input_bg_fwd=as.numeric(retreive_Cinput_bg_rcp26_fix),
-                                      clay_p=input$clay_slider,silt_p=input$silt,soil_thickness=input$soilthick,pH_p=ph_site,
-                                      lignin_to_nitrogen=input$LNratio,structural_in_lignin=input$SLratio,woodylittersize=input$WLS,AWEN_in=AWEN_input,decomp_to_resist_ratio=DR_in,
-                                      CN_Ratio=input$CNratio, Bulk_Density=input$bulkdensity, WFPS=water_filled_pore_space, CH4_Conc=input$CH4_data,
-                                      decomposition_param_RothC=ksRothC,
-                                      decomposition_param_ICBM=param_ICBM,
-                                      decomposition_param_Century=ksCent,
-                                      decomposition_param_Yasso07=paramYasso07,
-                                      decomposition_param_Yasso20=paramYasso20)
-    
-    print("End of multimodel simulation RCP2.6")
-    print(" ")
-    print("...Plotting RCP2.6 completed...")
-    
-    t_fwd_col = seq.int(1,simulation_length_CCscenario,by=computation_time_step_fwd)
-    
-    
-    data_mmRCP26 <- get_data_from_multimodel_run(test_mmRCP26,t_fwd_col)
-    minCRCP26=data_mmRCP26[[1]]
-    maxCRCP26=data_mmRCP26[[2]]
-    mmmean_totCRCP26=data_mmRCP26[[3]]
-    totC_Roth_C_RCP26=data_mmRCP26[[4]]
-    totC_ICBM_C_RCP26=data_mmRCP26[[5]]
-    totC_Century_C_RCP26=data_mmRCP26[[6]]
-    totC_Yasso07_C_RCP26=data_mmRCP26[[7]]
-    totC_Yasso20_C_RCP26=data_mmRCP26[[8]]
-    minFRCP26=data_mmRCP26[[9]]
-    maxFRCP26=data_mmRCP26[[10]]
-    mmmean_totFRCP26=data_mmRCP26[[11]]
-    totF_Roth_C_RCP26=data_mmRCP26[[12]]
-    totF_ICBM_C_RCP26=data_mmRCP26[[13]]
-    
-    totF_Century_C_RCP26=data_mmRCP26[[14]]
-    totF_Yasso07_C_RCP26=data_mmRCP26[[15]]
-    totF_Yasso20_C_RCP26=data_mmRCP26[[16]]
-    
-    totF_SG_C_RCP26=data_mmRCP26[[17]]
-    totCH4_SG_C_RCP26=data_mmRCP26[[18]]
-    totN2O_SG_C_RCP26=data_mmRCP26[[19]]
-    
-    
-    ###########################    ###########################
-    print("Preparing to run RCP60")
-    ###########################    ###########################
-    #This will launch the function defined in "Holisoils_multimodel_v1.R"
-    test_mmRCP60 <-Call_MULTIMODEL_i1(plot_figures=plot_figures,simulation_length=simulation_length_CCscenario, spinup_length=spinup_length,
-                                      computation_time_step_fwd=computation_time_step_fwd,
-                                      #computation_time_step_fwd=1, computation_time_step_spinup=1, tolti, perche ogni modello ha il suo gia predefinito
-                                      start_date_simulations=Prec_month_spinup_rcp26$Date[1],
-                                      temperature_spinup=Temp_day_spinup, precipitation_spinup=Precip_day_spinup, potential_evapotranspiration_spinup=Potevap_month_spinup_rcp26,
-                                      soilmoisture_spinup=as.numeric(Vswc_day_spinup$Vswc),
-                                      #soilmoisture_spinup=as.numeric(Vswc_day_spinup$Vswc),
-                                      temperature_fwd=Temp_day_fwd_rcp60_sel, precipitation_fwd=Precip_day_fwd_rcp60_sel, potential_evapotranspiration_fwd=Potevap_month_fwd_rcp60_sel,soilmoisture_fwd=as.numeric(Vswc_day_fwd_rcp60_sel$Vswc),
-                                      #soilmoisture_fwd=as.numeric(Vswc_day_fwd$Vswc),
-                                      SOC_0=input$SOC,
-                                      C_input_ag_spinup=as.numeric(mean(retreive_Cinput_ag_rcp60_fix)),C_input_bg_spinup=as.numeric(mean(retreive_Cinput_bg_rcp60_fix)),
-                                      C_input_ag_fwd=as.numeric(retreive_Cinput_ag_rcp60_fix),C_input_bg_fwd=as.numeric(retreive_Cinput_bg_rcp60_fix),
-                                      clay_p=input$clay_slider,silt_p=input$silt,soil_thickness=input$soilthick,pH_p=ph_site,
-                                      lignin_to_nitrogen=input$LNratio,structural_in_lignin=input$SLratio,woodylittersize=input$WLS,AWEN_in=AWEN_input,decomp_to_resist_ratio=DR_in,
-                                      CN_Ratio=input$CNratio, Bulk_Density=input$bulkdensity, WFPS=water_filled_pore_space, CH4_Conc=input$CH4_data,
-                                      decomposition_param_RothC=ksRothC,
-                                      decomposition_param_ICBM=param_ICBM,
-                                      decomposition_param_Century=ksCent,
-                                      decomposition_param_Yasso07=paramYasso07,
-                                      decomposition_param_Yasso20=paramYasso20)
-    
-    print("End of multimodel simulation RCP6.0")
-    print(" ")
-    print("...Plotting RCP6.0 completed...")
-    
-    data_mmRCP60 <- get_data_from_multimodel_run(test_mmRCP60,t_fwd_col)
-    minCRCP60=data_mmRCP60[[1]]
-    maxCRCP60=data_mmRCP60[[2]]
-    mmmean_totCRCP60=data_mmRCP60[[3]]
-    totC_Roth_C_RCP60=data_mmRCP60[[4]]
-    totC_ICBM_C_RCP60=data_mmRCP60[[5]]
-    totC_Century_C_RCP60=data_mmRCP60[[6]]
-    totC_Yasso07_C_RCP60=data_mmRCP60[[7]]
-    totC_Yasso20_C_RCP60=data_mmRCP60[[8]]
-    minFRCP60=data_mmRCP60[[9]]
-    maxFRCP60=data_mmRCP60[[10]]
-    mmmean_totFRCP60=data_mmRCP60[[11]]
-    totF_Roth_C_RCP60=data_mmRCP60[[12]]
-    totF_ICBM_C_RCP60=data_mmRCP60[[13]]
-    totF_Century_C_RCP60=data_mmRCP60[[14]]
-    totF_Yasso07_C_RCP60=data_mmRCP60[[15]]
-    totF_Yasso20_C_RCP60=data_mmRCP60[[16]]
-    
-    totF_SG_C_RCP60=data_mmRCP60[[17]]
-    totCH4_SG_C_RCP60=data_mmRCP60[[18]]
-    totN2O_SG_C_RCP60=data_mmRCP60[[19]]
-    
-    
-    ###########################
-    #Plot STOCKS COMPARISON CC
-    ###########################
-    
-    #par(mfrow=c(3,1),mar=c(6, 5, 5, 3))
-    
-    express_plotC = expression("SOC stocks (MgC"~{ha}^{-1}~")")
-    
-    minC <- min(cbind(minCRCP26,minCRCP60))
-    maxC <- max(cbind(maxCRCP26,maxCRCP60))
-    
-    t_fwd = seq(1,simulation_length_CCscenario,by=computation_time_step_fwd)
-    
-    plot(t_fwd, mmmean_totCRCP26, type="l", lty=1, lwd=3, xlab="Time (years)",ylab=" ",col="blue",ylim=c(minC-5,maxC+5))
-    lines(t_fwd,totC_Roth_C_RCP26,type="l", lty=1, lwd=1, col=alpha("blue",0.3))
-    lines(t_fwd,totC_ICBM_C_RCP26,type="l", lty=1,lwd=1, col=alpha("blue",0.3))
-    lines(t_fwd,totC_Century_C_RCP26,type="l", lty=1,lwd=1, col=alpha("blue",0.3))
-    lines(t_fwd,totC_Yasso07_C_RCP26,type="l", lty=1,lwd=1, col=alpha("blue",0.3))
-    lines(t_fwd,totC_Yasso20_C_RCP26,type="l", lty=1,lwd=1, col=alpha("blue",0.3))
-    title(ylab=express_plotC,main="Multi-model SOC stocks",mgp=c(2,1,0))
-    
-    lines(t_fwd,mmmean_totCRCP60,type="l", lty=1,lwd=3, col="red")
-    lines(t_fwd,totC_Roth_C_RCP60,type="l", lty=1,lwd=1, col=alpha("red",0.3))
-    lines(t_fwd,totC_ICBM_C_RCP60,type="l", lty=1,lwd=1, col=alpha("red",0.3))
-    lines(t_fwd,totC_Century_C_RCP60,type="l", lty=1,lwd=1, col=alpha("red",0.3))
-    lines(t_fwd,totC_Yasso07_C_RCP60,type="l", lty=1,lwd=1, col=alpha("red",0.3))
-    lines(t_fwd,totC_Yasso20_C_RCP60,type="l", lty=1,lwd=1, col=alpha("red",0.3))
-    
-    legend(par('usr')[2], par('usr')[4], c("RCP 2.6", "RCP 6.0"),
-           lty=1,lwd=c(3,3), col=c("blue","red"), cex=0.8,xpd=NA,bty="n")
-    
-    
-    #PLOT FLUXES COMPARISON CC
-    express_plotF = expression(CO[2]~"flux (MgC"~{ha}^{-1}*{year}^{-1}~")")
-    
-    minF <- min(cbind(minFRCP26,minFRCP60))
-    maxF <- max(cbind(maxFRCP26,maxFRCP60))
-    
-    plot(t_fwd, mmmean_totFRCP26, type="l", lty=1, lwd=3, xlab="Time (years)",ylab=" ",col="blue",ylim=c(minF-2,maxF+2))
-    lines(t_fwd,totF_Roth_C_RCP26,type="l", lty=1, lwd=1, col=alpha("blue",0.3))
-    lines(t_fwd,totF_ICBM_C_RCP26,type="l", lty=1,lwd=1, col=alpha("blue",0.3))
-    lines(t_fwd,totF_Century_C_RCP26,type="l", lty=1,lwd=1, col=alpha("blue",0.3))
-    lines(t_fwd,totF_Yasso07_C_RCP26,type="l", lty=1,lwd=1, col=alpha("blue",0.3))
-    lines(t_fwd,totF_Yasso20_C_RCP26,type="l", lty=1,lwd=1, col=alpha("blue",0.3))
-    lines(t_fwd,totF_SG_C_RCP26,type="l", lty=1,lwd=1, col=alpha("blue",0.3))
-    title(ylab=express_plotF,main= expression(bold("Multi-model "~CO[2]~"fluxes")),mgp=c(2,1,0))
-    
-    lines(t_fwd,mmmean_totFRCP60,type="l", lty=1,lwd=3, col="red")
-    lines(t_fwd,totF_Roth_C_RCP60,type="l", lty=1,lwd=1, col=alpha("red",0.3))
-    lines(t_fwd,totF_ICBM_C_RCP60,type="l", lty=1,lwd=1, col=alpha("red",0.3))
-    lines(t_fwd,totF_Century_C_RCP60,type="l", lty=1,lwd=1, col=alpha("red",0.3))
-    lines(t_fwd,totF_Yasso07_C_RCP60,type="l", lty=1,lwd=1, col=alpha("red",0.3))
-    lines(t_fwd,totF_Yasso20_C_RCP60,type="l", lty=1,lwd=1, col=alpha("red",0.3))
-    lines(t_fwd,totF_SG_C_RCP60,type="l", lty=1,lwd=1, col=alpha("red",0.3))
-    
-    legend(par('usr')[2], par('usr')[4], c("RCP 2.6", "RCP 6.0"),
-           lty=1,lwd=c(3,3), col=c("blue","red"), cex=0.8,xpd=NA,bty="n")
-    
-    
-    ########
-    # #PLOT CH4 and N2O SG
-    # express_plot_GHG=expression(N[2]~"O fluxes, "~CH[4]~"uptake (MgC"~{ha}^{-1}*{year}^{-1}~")")
-    # 
-    # max_GHG_RCP26 <-max(as.numeric(cbind(totCH4_SG_C_RCP26,totN2O_SG_C_RCP26)))
-    # max_GHG_RCP60 <-max(as.numeric(cbind(totCH4_SG_C_RCP60,totN2O_SG_C_RCP60)))
-    # max_GHG <- max(cbind(max_GHG_RCP26,max_GHG_RCP60))
-    # 
-    # plot(t_fwd, totCH4_SG_C_RCP26, type="l", lty=4, lwd=1, xlab="Time (years)",ylab=" ",col="blue",
-    #      ylim=c(-0.01,max_GHG+0.01))
-    # lines(t_fwd, totN2O_SG_C_RCP26, type="l", lty=3, lwd=1,col="blue")
-    # lines(t_fwd,totCH4_SG_C_RCP60,type="l", lty=4, lwd=1, col=alpha("red"))
-    # lines(t_fwd,totN2O_SG_C_RCP60,type="l", lty=3, lwd=1, col=alpha("red"))
-    # 
-    # title(ylab=express_plot_GHG,main= "Other GHG fluxes",mgp=c(2,1,0))
-    # 
-    # legend(par('usr')[2], par('usr')[4], c(expression(CH[4]~"uptake"),expression(N[2]~"O fluxes")),
-    #        lty=c(4,3),lwd=c(1,1), col="black", cex=0.8,xpd=NA,bty="n")
-    
-    
-    
-    data_download_FixedLU <-create_dataframe_for_download(t_fwd,
-                                                          data_mmRCP26,
-                                                          data_mmRCP60,
-                                                          "RCP2.6",
-                                                          "RCP6.0")
-    # Filter data based on user input
-    filtered_data <- reactive({
+    # Create 0-row data frame which will be used to store data
+    dat <- data.frame(x = numeric(0), y = numeric(0))
+    ######################################################################################################
+    withProgress(message = 'Processing', value = 0, {
+      # Number of times we'll go through the loop
+      n_progr<-9
+      i_progr<-1
       
-      subset(data_download_FixedLU,data_download_FixedLU$Variable== input$Select_variable
-             & data_download_FixedLU$Scenario== input$Select_RCP
-             & data_download_FixedLU$Model== input$Select_model)
+      # Each time through the loop, add another row of data. This is
+      # a stand-in for a long-running computation.
+      dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+      # Increment the progress bar, and update the detail text.
+      incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+      
+      print(" ")
+      print("####################################################")
+      print("####################################################")
+      print("Entering simulations_fixedLU")
+      print("####################################################")
+      print("####################################################")
+      #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>#
+      #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>#
+      #Run retreive_clim_data_site function to retrieve climate data for site
+      print("Retrieving climate data for site for climate scenarios")
+      #data_clim = retreive_clim_data_site()
+      # Potevap_month_spinup_rcp26=data_clim_potevap[[1]]
+      # Potevap_month_fwd_rcp26=data_clim_potevap[[4]]
+      # Potevap_month_fwd_rcp60=data_clim_potevap[[5]]
+      # Precip_day_spinup=data_clim_precip[[1]]
+      # Precip_day_fwd_rcp26=data_clim_precip[[4]]
+      # Precip_day_fwd_rcp60=data_clim_precip[[5]]
+      # Temp_day_spinup=data_clim_temp[[1]]
+      # Temp_day_fwd_rcp26=data_clim_temp[[4]]
+      # Temp_day_fwd_rcp60=data_clim_temp[[5]]
+      # Vswc_day_spinup=data_clim_vswc[[1]]
+      # Vswc_day_fwd_rcp26=data_clim_vswc[[4]]
+      # Vswc_day_fwd_rcp60=data_clim_vswc[[5]]
+      
+      data_clim_potevap<-retreive_clim_data_site_potevap()
+      Potevap_month_spinup_rcp26=data_clim_potevap[[1]]
+      Potevap_month_fwd_rcp26_sel=data_clim_potevap[[2]]
+      Potevap_month_fwd_rcp60_sel=data_clim_potevap[[3]]
+      
+      # Each time through the loop, add another row of data. This is
+      # a stand-in for a long-running computation.
+      dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+      # Increment the progress bar, and update the detail text.
+      i_progr<-i_progr+1
+      incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+      
+      
+      data_clim_precip<-retreive_clim_data_site_precip()
+      Precip_day_spinup=data_clim_precip[[1]]
+      Precip_day_fwd_rcp26_sel=data_clim_precip[[2]]
+      Precip_day_fwd_rcp60_sel=data_clim_precip[[3]]
+      
+      # Each time through the loop, add another row of data. This is
+      # a stand-in for a long-running computation.
+      dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+      # Increment the progress bar, and update the detail text.
+      i_progr<-i_progr+1
+      incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+      
+      data_clim_temp<-retreive_clim_data_site_temp()
+      Temp_day_spinup=data_clim_temp[[1]]
+      Temp_day_fwd_rcp26_sel=data_clim_temp[[2]]
+      Temp_day_fwd_rcp60_sel=data_clim_temp[[3]]
+      
+      # Each time through the loop, add another row of data. This is
+      # a stand-in for a long-running computation.
+      dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+      # Increment the progress bar, and update the detail text.
+      i_progr<-i_progr+1
+      incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+      
+      data_clim_vswc<-retreive_clim_data_site_vswc()
+      Vswc_day_spinup=data_clim_vswc[[1]]
+      Vswc_day_fwd_rcp26_sel=data_clim_vswc[[2]]
+      Vswc_day_fwd_rcp60_sel=data_clim_vswc[[3]]
+      
+      # Each time through the loop, add another row of data. This is
+      # a stand-in for a long-running computation.
+      dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+      # Increment the progress bar, and update the detail text.
+      i_progr<-i_progr+1
+      incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+      
+      #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<#
+      #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<#
+      
+      #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>#
+      #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>#
+      #Run retreive_Cinput function to retrieve Cinput for climate scenarios
+      print(" ")
+      print("Retrieving C input data for site")
+      
+      # #####
+      # #RCP26
+      # #####
+      
+      litter_file_rcp26<-nc_open("data/LITTER/npp_average_rcp26_EU_annual_2006_2099_fixed.nc4")
+      #litter_file_rcp26<-nc_open(paste0(temp_file,"/npp_average_rcp26_EU_annual_2006_2099_fixed.nc4"))
+      #----------------------------------------------------
+      #Read lon-lat-time variables
+      lon_litter_rcp26 <- ncvar_get(litter_file_rcp26, varid = "lon")
+      lat_litter_rcp26 <- ncvar_get(litter_file_rcp26, varid = "lat")
+      #Convert time to dates
+      litter_time_rcp26 <- as.Date("1661-1-1") %m+% years(litter_file_rcp26$dim$time$vals)
+      
+      #Retrieve variable for whole time length
+      litter_rcp26_npp <- ncvar_get(litter_file_rcp26, "npp") #kg/m2/sec
+      
+      #convert npp (#kg/m2/sec) to foliar Litterfall carbon with constant coefficient (see Neumann et al., 2018 and Malhi et al., 2011)
+      litter_rcp26_ag <- litter_rcp26_npp*0.34
+      #calculate belowground carbon input with equation from Jonard et al., 2007 fineroot_in (g/m2/yr) =0.333*(1.92*AG_litterfall(g/m2/yr)+130)
+      #where *1000*(60*60*24*365.25) is the conversion factor from kg/m2/sec to (g/m2/yr)
+      litter_rcp26_bg <- 0.333*(1.92*(litter_rcp26_ag*1000*(60*60*24*365.25))+130)/(1000*(60*60*24*365.25)) 
+      
+      retreive_Cinput_ag_rcp26_fix = retreive_Cinput(lon_litter_rcp26,lat_litter_rcp26,litter_time_rcp26,litter_rcp26_ag)
+      retreive_Cinput_bg_rcp26_fix = retreive_Cinput(lon_litter_rcp26,lat_litter_rcp26,litter_time_rcp26,litter_rcp26_bg)
+      retreive_Cinput_rcp26_fix = retreive_Cinput_ag_rcp26_fix+retreive_Cinput_bg_rcp26_fix
+      
+      rm(litter_file_rcp26,lon_litter_rcp26,lat_litter_rcp26,litter_time_rcp26,litter_rcp26_ag,litter_rcp26_bg,litter_rcp26_npp)
+      
+      # Each time through the loop, add another row of data. This is
+      # a stand-in for a long-running computation.
+      dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+      # Increment the progress bar, and update the detail text.
+      i_progr<-i_progr+1
+      incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+      
+      # #####
+      # #RCP60
+      # ##### 
+      litter_file_rcp60<-nc_open("data/LITTER/npp_average_rcp60_EU_annual_2006_2099_fixed.nc4")
+      #litter_file_rcp60<-nc_open(paste0(temp_file,"/npp_average_rcp60_EU_annual_2006_2099_fixed.nc4"))
+      #----------------------------------------------------
+      #Read lon-lat-time variables
+      lon_litter_rcp60 <- ncvar_get(litter_file_rcp60, varid = "lon")
+      lat_litter_rcp60 <- ncvar_get(litter_file_rcp60, varid = "lat")
+      #Convert time to dates
+      litter_time_rcp60 <- as.Date("1661-1-1") %m+% years(litter_file_rcp60$dim$time$vals)
+      # #Convert time to dates
+      # litter_time_plot_rcp60 <- as.Date.character(format(litter_time_rcp60, "%Y-%m-%d"))
+      #Retrieve variable for whole time length
+      litter_rcp60_npp <- ncvar_get(litter_file_rcp60, "npp")
+      
+      #convert npp (#kg/m2/sec) to foliar Litterfall carbon with constant coefficient (see Neumann et al., 2018 and Malhi et al., 2011)
+      litter_rcp60_ag <- litter_rcp60_npp*0.34
+      #calculate belowground carbon input with equation from Jonard et al., 2007 fineroot_in (g/m2/yr) =0.333*(1.92*AG_litterfall(g/m2/yr)+130)
+      #where *1000*(60*60*24*365.25) is the conversion factor from kg/m2/sec to (g/m2/yr)
+      litter_rcp60_bg <- 0.333*(1.92*(litter_rcp60_ag*1000*(60*60*24*365.25))+130)/(1000*(60*60*24*365.25)) 
+      
+      retreive_Cinput_ag_rcp60_fix = retreive_Cinput(lon_litter_rcp60,lat_litter_rcp60,litter_time_rcp60,litter_rcp60_ag)
+      retreive_Cinput_bg_rcp60_fix = retreive_Cinput(lon_litter_rcp60,lat_litter_rcp60,litter_time_rcp60,litter_rcp60_bg)
+      retreive_Cinput_rcp60_fix=retreive_Cinput_ag_rcp60_fix+retreive_Cinput_bg_rcp60_fix
+      
+      rm(litter_file_rcp60,lon_litter_rcp60,lat_litter_rcp60,litter_time_rcp60,litter_rcp60_ag,litter_rcp60_bg,litter_rcp60_npp)
+      
+      # Each time through the loop, add another row of data. This is
+      # a stand-in for a long-running computation.
+      dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+      # Increment the progress bar, and update the detail text.
+      i_progr<-i_progr+1
+      incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+      
+      AWEN_input = c(as.numeric(input$A_pool),
+                     as.numeric(input$W_pool),
+                     as.numeric(input$E_pool),
+                     as.numeric(input$N_pool),
+                     0)
+      
+      #Suppose W and E litter compounds are more labile
+      decomposable_plant_material <-as.numeric(input$W_pool)+as.numeric(input$E_pool)
+      #Suppose A and N litter compounds are more resistant
+      resistant_plant_material <-as.numeric(input$A_pool)+as.numeric(input$N_pool)
+      #Decomposable to resistant ratio
+      DR_in = decomposable_plant_material/resistant_plant_material
+      
+      
+      #CHANGE
+      computation_time_step_fwd = 1
+      #simulation_length_CCscenario = length(Potevap_month_fwd_rcp26$Date)/12
+      simulation_length_CCscenario = simulation_length()
+      
+      ######
+      print("####################################################")
+      print("Preparing to run RCP26")
+      print("####################################################")
+      ######
+      test_mmRCP26 <-Call_MULTIMODEL_i1(plot_figures=plot_figures,simulation_length=simulation_length_CCscenario, spinup_length=spinup_length,
+                                        computation_time_step_fwd=computation_time_step_fwd,
+                                        start_date_simulations=dates_in(),
+                                        temperature_spinup=Temp_day_spinup, precipitation_spinup=Precip_day_spinup, potential_evapotranspiration_spinup=Potevap_month_spinup_rcp26,
+                                        soilmoisture_spinup=as.numeric(Vswc_day_spinup$Vswc),
+                                        temperature_fwd=Temp_day_fwd_rcp26_sel, precipitation_fwd=Precip_day_fwd_rcp26_sel, potential_evapotranspiration_fwd=Potevap_month_fwd_rcp26_sel,soilmoisture_fwd=as.numeric(Vswc_day_fwd_rcp26_sel$Vswc),
+                                        SOC_0=input$SOC,
+                                        C_input_ag_spinup=as.numeric(mean(retreive_Cinput_ag_rcp26_fix)),C_input_bg_spinup=as.numeric(mean(retreive_Cinput_bg_rcp26_fix)),
+                                        C_input_ag_fwd=as.numeric(retreive_Cinput_ag_rcp26_fix),C_input_bg_fwd=as.numeric(retreive_Cinput_bg_rcp26_fix),
+                                        clay_p=input$clay_slider,silt_p=input$silt,soil_thickness=input$soilthick,pH_p=ph_site,
+                                        lignin_to_nitrogen=input$LNratio,structural_in_lignin=input$SLratio,woodylittersize=input$WLS,AWEN_in=AWEN_input,decomp_to_resist_ratio=DR_in,
+                                        CN_Ratio=input$CNratio, Bulk_Density=input$bulkdensity, WFPS=water_filled_pore_space, CH4_Conc=input$CH4_data,
+                                        decomposition_param_RothC=ksRothC,
+                                        decomposition_param_ICBM=param_ICBM,
+                                        decomposition_param_Century=ksCent,
+                                        decomposition_param_Yasso07=paramYasso07,
+                                        decomposition_param_Yasso20=paramYasso20)
+      
+      print("End of multimodel simulation RCP2.6")
+      print(" ")
+      print("...Plotting RCP2.6 completed...")
+      
+      # Each time through the loop, add another row of data. This is
+      # a stand-in for a long-running computation.
+      dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+      # Increment the progress bar, and update the detail text.
+      i_progr<-i_progr+1
+      incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+      
+      t_fwd_col = seq.int(1,simulation_length_CCscenario,by=computation_time_step_fwd)
+      
+      
+      data_mmRCP26 <- get_data_from_multimodel_run(test_mmRCP26,t_fwd_col)
+      minCRCP26=data_mmRCP26[[1]]
+      maxCRCP26=data_mmRCP26[[2]]
+      mmmean_totCRCP26=data_mmRCP26[[3]]
+      totC_Roth_C_RCP26=data_mmRCP26[[4]]
+      totC_ICBM_C_RCP26=data_mmRCP26[[5]]
+      totC_Century_C_RCP26=data_mmRCP26[[6]]
+      totC_Yasso07_C_RCP26=data_mmRCP26[[7]]
+      totC_Yasso20_C_RCP26=data_mmRCP26[[8]]
+      minFRCP26=data_mmRCP26[[9]]
+      maxFRCP26=data_mmRCP26[[10]]
+      mmmean_totFRCP26=data_mmRCP26[[11]]
+      totF_Roth_C_RCP26=data_mmRCP26[[12]]
+      totF_ICBM_C_RCP26=data_mmRCP26[[13]]
+      
+      totF_Century_C_RCP26=data_mmRCP26[[14]]
+      totF_Yasso07_C_RCP26=data_mmRCP26[[15]]
+      totF_Yasso20_C_RCP26=data_mmRCP26[[16]]
+      
+      totF_SG_C_RCP26=data_mmRCP26[[17]]
+      totCH4_SG_C_RCP26=data_mmRCP26[[18]]
+      totN2O_SG_C_RCP26=data_mmRCP26[[19]]
+      
+      
+      ###########################    ###########################
+      print("Preparing to run RCP60")
+      ###########################    ###########################
+      #This will launch the function defined in "Holisoils_multimodel_v1.R"
+      test_mmRCP60 <-Call_MULTIMODEL_i1(plot_figures=plot_figures,simulation_length=simulation_length_CCscenario, spinup_length=spinup_length,
+                                        computation_time_step_fwd=computation_time_step_fwd,
+                                        #computation_time_step_fwd=1, computation_time_step_spinup=1, tolti, perche ogni modello ha il suo gia predefinito
+                                        start_date_simulations=Prec_month_spinup_rcp26$Date[1],
+                                        temperature_spinup=Temp_day_spinup, precipitation_spinup=Precip_day_spinup, potential_evapotranspiration_spinup=Potevap_month_spinup_rcp26,
+                                        soilmoisture_spinup=as.numeric(Vswc_day_spinup$Vswc),
+                                        #soilmoisture_spinup=as.numeric(Vswc_day_spinup$Vswc),
+                                        temperature_fwd=Temp_day_fwd_rcp60_sel, precipitation_fwd=Precip_day_fwd_rcp60_sel, potential_evapotranspiration_fwd=Potevap_month_fwd_rcp60_sel,soilmoisture_fwd=as.numeric(Vswc_day_fwd_rcp60_sel$Vswc),
+                                        #soilmoisture_fwd=as.numeric(Vswc_day_fwd$Vswc),
+                                        SOC_0=input$SOC,
+                                        C_input_ag_spinup=as.numeric(mean(retreive_Cinput_ag_rcp60_fix)),C_input_bg_spinup=as.numeric(mean(retreive_Cinput_bg_rcp60_fix)),
+                                        C_input_ag_fwd=as.numeric(retreive_Cinput_ag_rcp60_fix),C_input_bg_fwd=as.numeric(retreive_Cinput_bg_rcp60_fix),
+                                        clay_p=input$clay_slider,silt_p=input$silt,soil_thickness=input$soilthick,pH_p=ph_site,
+                                        lignin_to_nitrogen=input$LNratio,structural_in_lignin=input$SLratio,woodylittersize=input$WLS,AWEN_in=AWEN_input,decomp_to_resist_ratio=DR_in,
+                                        CN_Ratio=input$CNratio, Bulk_Density=input$bulkdensity, WFPS=water_filled_pore_space, CH4_Conc=input$CH4_data,
+                                        decomposition_param_RothC=ksRothC,
+                                        decomposition_param_ICBM=param_ICBM,
+                                        decomposition_param_Century=ksCent,
+                                        decomposition_param_Yasso07=paramYasso07,
+                                        decomposition_param_Yasso20=paramYasso20)
+      
+      print("End of multimodel simulation RCP6.0")
+      print(" ")
+      print("...Plotting RCP6.0 completed...")
+      
+      # Each time through the loop, add another row of data. This is
+      # a stand-in for a long-running computation.
+      dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+      # Increment the progress bar, and update the detail text.
+      i_progr<-i_progr+1
+      incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+      
+      data_mmRCP60 <- get_data_from_multimodel_run(test_mmRCP60,t_fwd_col)
+      minCRCP60=data_mmRCP60[[1]]
+      maxCRCP60=data_mmRCP60[[2]]
+      mmmean_totCRCP60=data_mmRCP60[[3]]
+      totC_Roth_C_RCP60=data_mmRCP60[[4]]
+      totC_ICBM_C_RCP60=data_mmRCP60[[5]]
+      totC_Century_C_RCP60=data_mmRCP60[[6]]
+      totC_Yasso07_C_RCP60=data_mmRCP60[[7]]
+      totC_Yasso20_C_RCP60=data_mmRCP60[[8]]
+      minFRCP60=data_mmRCP60[[9]]
+      maxFRCP60=data_mmRCP60[[10]]
+      mmmean_totFRCP60=data_mmRCP60[[11]]
+      totF_Roth_C_RCP60=data_mmRCP60[[12]]
+      totF_ICBM_C_RCP60=data_mmRCP60[[13]]
+      totF_Century_C_RCP60=data_mmRCP60[[14]]
+      totF_Yasso07_C_RCP60=data_mmRCP60[[15]]
+      totF_Yasso20_C_RCP60=data_mmRCP60[[16]]
+      
+      totF_SG_C_RCP60=data_mmRCP60[[17]]
+      totCH4_SG_C_RCP60=data_mmRCP60[[18]]
+      totN2O_SG_C_RCP60=data_mmRCP60[[19]]
+      
+      
+      ###########################
+      #Plot STOCKS COMPARISON CC
+      ###########################
+      
+      #par(mfrow=c(3,1),mar=c(6, 5, 5, 3))
+      
+      express_plotC = expression("SOC stocks (MgC"~{ha}^{-1}~")")
+      
+      minC <- min(cbind(minCRCP26,minCRCP60))
+      maxC <- max(cbind(maxCRCP26,maxCRCP60))
+      
+      t_fwd = seq(1,simulation_length_CCscenario,by=computation_time_step_fwd)
+
+      par(mar=c(6, 4, 4, 3))
+      
+      plot(t_fwd, mmmean_totCRCP26, type="l", lty=1, lwd=3, xlab="Time (years)",ylab=" ",col="blue",ylim=c(minC-5,maxC+5))
+      lines(t_fwd,totC_Roth_C_RCP26,type="l", lty=1, lwd=1, col=alpha("blue",0.3))
+      lines(t_fwd,totC_ICBM_C_RCP26,type="l", lty=1,lwd=1, col=alpha("blue",0.3))
+      lines(t_fwd,totC_Century_C_RCP26,type="l", lty=1,lwd=1, col=alpha("blue",0.3))
+      lines(t_fwd,totC_Yasso07_C_RCP26,type="l", lty=1,lwd=1, col=alpha("blue",0.3))
+      lines(t_fwd,totC_Yasso20_C_RCP26,type="l", lty=1,lwd=1, col=alpha("blue",0.3))
+      title(ylab=express_plotC,main="Multi-model SOC stocks",mgp=c(2,1,0))
+      
+      lines(t_fwd,mmmean_totCRCP60,type="l", lty=1,lwd=3, col="red")
+      lines(t_fwd,totC_Roth_C_RCP60,type="l", lty=1,lwd=1, col=alpha("red",0.3))
+      lines(t_fwd,totC_ICBM_C_RCP60,type="l", lty=1,lwd=1, col=alpha("red",0.3))
+      lines(t_fwd,totC_Century_C_RCP60,type="l", lty=1,lwd=1, col=alpha("red",0.3))
+      lines(t_fwd,totC_Yasso07_C_RCP60,type="l", lty=1,lwd=1, col=alpha("red",0.3))
+      lines(t_fwd,totC_Yasso20_C_RCP60,type="l", lty=1,lwd=1, col=alpha("red",0.3))
+      
+      legend(par('usr')[2], par('usr')[4], c("RCP 2.6", "RCP 6.0"),
+             lty=1,lwd=c(3,3), col=c("blue","red"), cex=1,xpd=NA,bty="n")
+      
+      
+      #PLOT FLUXES COMPARISON CC
+      express_plotF = expression(CO[2]~"flux (MgC"~{ha}^{-1}*{year}^{-1}~")")
+      
+      minF <- min(cbind(minFRCP26,minFRCP60))
+      maxF <- max(cbind(maxFRCP26,maxFRCP60))
+      
+      plot(t_fwd, mmmean_totFRCP26, type="l", lty=1, lwd=3, xlab="Time (years)",ylab=" ",col="blue",ylim=c(minF-2,maxF+2))
+      lines(t_fwd,totF_Roth_C_RCP26,type="l", lty=1, lwd=1, col=alpha("blue",0.3))
+      lines(t_fwd,totF_ICBM_C_RCP26,type="l", lty=1,lwd=1, col=alpha("blue",0.3))
+      lines(t_fwd,totF_Century_C_RCP26,type="l", lty=1,lwd=1, col=alpha("blue",0.3))
+      lines(t_fwd,totF_Yasso07_C_RCP26,type="l", lty=1,lwd=1, col=alpha("blue",0.3))
+      lines(t_fwd,totF_Yasso20_C_RCP26,type="l", lty=1,lwd=1, col=alpha("blue",0.3))
+      lines(t_fwd,totF_SG_C_RCP26,type="l", lty=1,lwd=1, col=alpha("blue",0.3))
+      title(ylab=express_plotF,main= expression(bold("Multi-model "~CO[2]~"fluxes")),mgp=c(2,1,0))
+      
+      lines(t_fwd,mmmean_totFRCP60,type="l", lty=1,lwd=3, col="red")
+      lines(t_fwd,totF_Roth_C_RCP60,type="l", lty=1,lwd=1, col=alpha("red",0.3))
+      lines(t_fwd,totF_ICBM_C_RCP60,type="l", lty=1,lwd=1, col=alpha("red",0.3))
+      lines(t_fwd,totF_Century_C_RCP60,type="l", lty=1,lwd=1, col=alpha("red",0.3))
+      lines(t_fwd,totF_Yasso07_C_RCP60,type="l", lty=1,lwd=1, col=alpha("red",0.3))
+      lines(t_fwd,totF_Yasso20_C_RCP60,type="l", lty=1,lwd=1, col=alpha("red",0.3))
+      lines(t_fwd,totF_SG_C_RCP60,type="l", lty=1,lwd=1, col=alpha("red",0.3))
+      
+      legend(par('usr')[2], par('usr')[4], c("RCP 2.6", "RCP 6.0"),
+             lty=1,lwd=c(3,3), col=c("blue","red"), cex=1,xpd=NA,bty="n")
+      
+      
+      ########
+      # #PLOT CH4 and N2O SG
+      # express_plot_GHG=expression(N[2]~"O fluxes, "~CH[4]~"uptake (MgC"~{ha}^{-1}*{year}^{-1}~")")
+      # 
+      # max_GHG_RCP26 <-max(as.numeric(cbind(totCH4_SG_C_RCP26,totN2O_SG_C_RCP26)))
+      # max_GHG_RCP60 <-max(as.numeric(cbind(totCH4_SG_C_RCP60,totN2O_SG_C_RCP60)))
+      # max_GHG <- max(cbind(max_GHG_RCP26,max_GHG_RCP60))
+      # 
+      # plot(t_fwd, totCH4_SG_C_RCP26, type="l", lty=4, lwd=1, xlab="Time (years)",ylab=" ",col="blue",
+      #      ylim=c(-0.01,max_GHG+0.01))
+      # lines(t_fwd, totN2O_SG_C_RCP26, type="l", lty=3, lwd=1,col="blue")
+      # lines(t_fwd,totCH4_SG_C_RCP60,type="l", lty=4, lwd=1, col=alpha("red"))
+      # lines(t_fwd,totN2O_SG_C_RCP60,type="l", lty=3, lwd=1, col=alpha("red"))
+      # 
+      # title(ylab=express_plot_GHG,main= "Other GHG fluxes",mgp=c(2,1,0))
+      # 
+      # legend(par('usr')[2], par('usr')[4], c(expression(CH[4]~"uptake"),expression(N[2]~"O fluxes")),
+      #        lty=c(4,3),lwd=c(1,1), col="black", cex=0.8,xpd=NA,bty="n")
+      
+      
+      
+      data_download_FixedLU <-create_dataframe_for_download(t_fwd,
+                                                            data_mmRCP26,
+                                                            data_mmRCP60,
+                                                            "RCP2.6",
+                                                            "RCP6.0")
+      # Filter data based on user input
+      filtered_data <- reactive({
+        
+        subset(data_download_FixedLU,data_download_FixedLU$Variable== input$Select_variable
+               & data_download_FixedLU$Scenario== input$Select_RCP
+               & data_download_FixedLU$Model== input$Select_model)
+      })
+      
+      observe({
+        category_choices <- subset(data_download_FixedLU,data_download_FixedLU$Variable== input$Select_variable)
+        updateSelectInput(session, "Select_model", choices = unique(category_choices$Model))
+      })
+      
+      #Show data in table
+      output$outTable_FixedLU <- renderDT({
+        datatable(filtered_data(), options = list(pageLength = 10),
+                  rownames = FALSE)
+      })
+      
+      # Downloadable csv of selected dataset ----
+      output$downloadData_FixedLU <- downloadHandler(
+        filename = function() {
+          paste("data_", input$Select_variable, "_", input$Select_RCP, "_", input$Select_model, ".csv", sep = "")
+        },
+        content = function(file) {
+          write.csv(filtered_data(), file, row.names = FALSE)
+        }
+      )
+      
     })
-    
-    observe({
-      category_choices <- subset(data_download_FixedLU,data_download_FixedLU$Variable== input$Select_variable)
-      updateSelectInput(session, "Select_model", choices = unique(category_choices$Model))
-    })
-    
-    #Show data in table
-    output$outTable_FixedLU <- renderDT({
-      datatable(filtered_data(), options = list(pageLength = 10),
-                rownames = FALSE)
-    })
-    
-    # Downloadable csv of selected dataset ----
-    output$downloadData_FixedLU <- downloadHandler(
-      filename = function() {
-        paste("data_", input$Select_variable, "_", input$Select_RCP, "_", input$Select_model, ".csv", sep = "")
-      },
-      content = function(file) {
-        write.csv(filtered_data(), file, row.names = FALSE)
-      }
-    )
-    
     
   }) #renderPlot
   
@@ -4296,405 +5456,272 @@ server <- function(input, output,session) {
   output$simulations_LUchange<- renderPlot({
     print("Entering simulations_LUchange")
     req(input$clay_slider2)
-    #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>#
-    #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>#
-    #Run retreive_clim_data_site function to retrieve climate data for site
-    print("Retrieving climate data for site for climate scenarios")
-    data_clim = retreive_clim_data_site()
-    # Potevap_month_spinup_rcp26=data_clim[[1]]
-    # Potevap_month_fwd_rcp26=data_clim[[13]]
-    # Potevap_month_fwd_rcp60=data_clim[[14]]
-    # Precip_day_spinup=data_clim[[4]]
-    # Precip_day_fwd_rcp26=data_clim[[15]]
-    # Precip_day_fwd_rcp60=data_clim[[16]]
-    # Temp_day_spinup=data_clim[[7]]
-    # Temp_day_fwd_rcp26=data_clim[[17]]
-    # Temp_day_fwd_rcp60=data_clim[[18]]
-    # Vswc_day_spinup=data_clim[[10]]
-    # Vswc_day_fwd_rcp26=data_clim[[19]]
-    # Vswc_day_fwd_rcp60=data_clim[[20]]
-    
-    Potevap_month_spinup_rcp26=data_clim[[1]]
-    Potevap_month_fwd_rcp26_sel=data_clim[[2]]
-    Potevap_month_fwd_rcp60_sel=data_clim[[3]]
-    Precip_day_spinup=data_clim[[4]]
-    Precip_day_fwd_rcp26_sel=data_clim[[5]]
-    Precip_day_fwd_rcp60_sel=data_clim[[6]]
-    Temp_day_spinup=data_clim[[7]]
-    Temp_day_fwd_rcp26_sel=data_clim[[8]]
-    Temp_day_fwd_rcp60_sel=data_clim[[9]]
-    Vswc_day_spinup=data_clim[[10]]
-    Vswc_day_fwd_rcp26_sel=data_clim[[11]]
-    Vswc_day_fwd_rcp60_sel=data_clim[[12]]
-    #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<#
-    #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<#
-    
-    #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>#
-    #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>#
-    #Run retreive_Cinput function to retrieve Cinput for climate scenarios
-    print("Retrieving climate data for site for climate scenarios")
-    retreive_Cinput_ag_rcp26_fix = retreive_Cinput(lon_litter_rcp26,lat_litter_rcp26,litter_time_rcp26,litter_rcp26_ag)
-    retreive_Cinput_bg_rcp26_fix = retreive_Cinput(lon_litter_rcp26,lat_litter_rcp26,litter_time_rcp26,litter_rcp26_bg)
-    retreive_Cinput_rcp26_fix = retreive_Cinput_ag_rcp26_fix+retreive_Cinput_bg_rcp26_fix
-    #retreive_Cinput_rcp26_fix_mean = mean(retreive_Cinput_rcp26_fix)
-    
-    retreive_Cinput_ag_rcp60_fix = retreive_Cinput(lon_litter_rcp60,lat_litter_rcp60,litter_time_rcp60,litter_rcp60_ag)
-    retreive_Cinput_bg_rcp60_fix = retreive_Cinput(lon_litter_rcp60,lat_litter_rcp60,litter_time_rcp60,litter_rcp60_bg)
-    retreive_Cinput_rcp60_fix=retreive_Cinput_ag_rcp60_fix+retreive_Cinput_bg_rcp60_fix
-    #retreive_Cinput_rcp60_fix_mean = mean(retreive_Cinput_rcp60_fix)
-    
-    retreive_Cinput_ag_rcp26_var = retreive_Cinput(lon_litter_LU_rcp26,lat_litter_LU_rcp26,litter_LU_time_rcp26,litter_LU_rcp26_ag)
-    retreive_Cinput_bg_rcp26_var = retreive_Cinput(lon_litter_LU_rcp26,lat_litter_LU_rcp26,litter_LU_time_rcp26,litter_LU_rcp26_bg)
-    retreive_Cinput_rcp26_var = retreive_Cinput_ag_rcp26_var+retreive_Cinput_bg_rcp26_var
-    #retreive_Cinput_rcp26_var_mean = mean(retreive_Cinput_rcp26_var)
-    
-    retreive_Cinput_ag_rcp60_var = retreive_Cinput(lon_litter_LU_rcp60,lat_litter_LU_rcp60,litter_LU_time_rcp60,litter_LU_rcp60_ag)
-    retreive_Cinput_bg_rcp60_var = retreive_Cinput(lon_litter_LU_rcp60,lat_litter_LU_rcp60,litter_LU_time_rcp60,litter_LU_rcp60_bg)
-    retreive_Cinput_rcp60_var = retreive_Cinput_ag_rcp60_var+retreive_Cinput_bg_rcp60_var
-    #retreive_Cinput_rcp60_var_mean = mean(retreive_Cinput_rcp60_var)
-    
-    AWEN_input = c(as.numeric(input$A_pool),
-                   as.numeric(input$W_pool),
-                   as.numeric(input$E_pool),
-                   as.numeric(input$N_pool),
-                   0)
-    #Suppose W and E litter compounds are more labile
-    decomposable_plant_material <-as.numeric(input$W_pool)+as.numeric(input$E_pool)
-    #Suppose A and N litter compounds are more resistant
-    resistant_plant_material <-as.numeric(input$A_pool)+as.numeric(input$N_pool)
-    #Decomposable to resistant ratio
-    DR_in = decomposable_plant_material/resistant_plant_material
-    
-    #CHANGE
-    computation_time_step_fwd = 1
-    #simulation_length_CCscenario = length(Potevap_month_fwd_rcp26$Date)/12
-    simulation_length_CCscenario=simulation_length()
-    ######
-    print("Preparing to run RCP26")
-    ######
-    #This will launch the function defined in "Holisoils_multimodel_v1.R"
-    test_mmRCP26_var <-Call_MULTIMODEL_i1(plot_figures=plot_figures,simulation_length=simulation_length_CCscenario, spinup_length=spinup_length,
-                                          computation_time_step_fwd=computation_time_step_fwd,
-                                          #computation_time_step_fwd=1, computation_time_step_spinup=1, tolti, perche ogni modello ha il suo gia predefinito
-                                          start_date_simulations=Prec_month_spinup_rcp26$Date[1],
-                                          temperature_spinup=Temp_day_spinup, precipitation_spinup=Precip_day_spinup, potential_evapotranspiration_spinup=Potevap_month_spinup_rcp26,
-                                          soilmoisture_spinup=as.numeric(Vswc_day_spinup$Vswc),
-                                          #soilmoisture_spinup=as.numeric(Vswc_day_spinup$Vswc),
-                                          temperature_fwd=Temp_day_fwd_rcp26_sel, precipitation_fwd=Precip_day_fwd_rcp26_sel, potential_evapotranspiration_fwd=Potevap_month_fwd_rcp26_sel,soilmoisture_fwd=as.numeric(Vswc_day_fwd_rcp26_sel$Vswc),
-                                          #soilmoisture_fwd=as.numeric(Vswc_day_fwd$Vswc),
-                                          SOC_0=input$SOC,
-                                          C_input_ag_spinup=as.numeric(mean(retreive_Cinput_ag_rcp26_var)),C_input_bg_spinup=as.numeric(mean(retreive_Cinput_bg_rcp26_var)),
-                                          C_input_ag_fwd=as.numeric(retreive_Cinput_ag_rcp26_var),C_input_bg_fwd=as.numeric(retreive_Cinput_bg_rcp26_var),
-                                          #clay_p=input$clay,silt_p=input$silt,soil_thickness=input$soilthick,pH_p=ph_site,
-                                          clay_p=input$clay_slider2,silt_p=input$silt,soil_thickness=input$soilthick,pH_p=ph_site,
-                                          lignin_to_nitrogen=input$LNratio,structural_in_lignin=input$SLratio,woodylittersize=input$WLS,AWEN_in=AWEN_input,decomp_to_resist_ratio=DR_in,
-                                          CN_Ratio=input$CNratio, Bulk_Density=input$bulkdensity, WFPS=water_filled_pore_space, CH4_Conc=input$CH4_data,
-                                          decomposition_param_RothC=ksRothC,
-                                          decomposition_param_ICBM=param_ICBM,
-                                          decomposition_param_Century=ksCent,
-                                          decomposition_param_Yasso07=paramYasso07,
-                                          decomposition_param_Yasso20=paramYasso20)
-    
-    print("End of multimodel simulation RCP2.6")
-    print(" ")
-    print("...Plotting RCP2.6 completed...")
-    
-    t_fwd_col = seq.int(1,simulation_length_CCscenario,by=computation_time_step_fwd)
-    
-    data_mmRCP26_var <- get_data_from_multimodel_run(test_mmRCP26_var,t_fwd_col)
-    minCRCP26_var=data_mmRCP26_var[[1]]
-    maxCRCP26_var=data_mmRCP26_var[[2]]
-    mmmean_totCRCP26_var=data_mmRCP26_var[[3]]
-    totC_Roth_C_RCP26_var=data_mmRCP26_var[[4]]
-    totC_ICBM_C_RCP26_var=data_mmRCP26_var[[5]]
-    totC_Century_C_RCP26_var=data_mmRCP26_var[[6]]
-    totC_Yasso07_C_RCP26_var=data_mmRCP26_var[[7]]
-    totC_YASSO20_C_RCP26_var=data_mmRCP26_var[[8]]
-    minFRCP26_var=data_mmRCP26_var[[9]]
-    maxFRCP26_var=data_mmRCP26_var[[10]]
-    mmmean_totFRCP26_var=data_mmRCP26_var[[11]]
-    totF_Roth_C_RCP26_var=data_mmRCP26_var[[12]]
-    totF_ICBM_C_RCP26_var=data_mmRCP26_var[[13]]
-    totF_Century_C_RCP26_var=data_mmRCP26_var[[14]]
-    totF_Yasso07_C_RCP26_var=data_mmRCP26_var[[15]]
-    totF_Yasso20_C_RCP26_var=data_mmRCP26_var[[16]]
-    
-    totF_SG_C_RCP26_var=data_mmRCP26_var[[17]]
-    totCH4_SG_C_RCP26_var=data_mmRCP26_var[[18]]
-    totN2O_SG_C_RCP26_var=data_mmRCP26_var[[19]]
-    
-    ###########################    ###########################
-    print("Preparing to run RCP60")
-    ###########################    ###########################
-    #This will launch the function defined in "Holisoils_multimodel_v1.R"
-    test_mmRCP60_var <-Call_MULTIMODEL_i1(plot_figures=plot_figures,simulation_length=simulation_length_CCscenario, spinup_length=spinup_length,
-                                          computation_time_step_fwd=computation_time_step_fwd,
-                                          #computation_time_step_fwd=1, computation_time_step_spinup=1, tolti, perche ogni modello ha il suo gia predefinito
-                                          start_date_simulations=Prec_month_spinup_rcp26$Date[1],
-                                          temperature_spinup=Temp_day_spinup, precipitation_spinup=Precip_day_spinup, potential_evapotranspiration_spinup=Potevap_month_spinup_rcp26,
-                                          soilmoisture_spinup=as.numeric(Vswc_day_spinup$Vswc),
-                                          temperature_fwd=Temp_day_fwd_rcp60_sel, precipitation_fwd=Precip_day_fwd_rcp60_sel, potential_evapotranspiration_fwd=Potevap_month_fwd_rcp60_sel,soilmoisture_fwd=as.numeric(Vswc_day_fwd_rcp60_sel$Vswc),
-                                          SOC_0=input$SOC,
-                                          C_input_ag_spinup=as.numeric(mean(retreive_Cinput_ag_rcp60_var)),C_input_bg_spinup=as.numeric(mean(retreive_Cinput_bg_rcp60_var)),
-                                          C_input_ag_fwd=as.numeric(retreive_Cinput_ag_rcp60_var),C_input_bg_fwd=as.numeric(retreive_Cinput_bg_rcp60_var),
-                                          clay_p=input$clay_slider2,silt_p=input$silt,soil_thickness=input$soilthick,pH_p=ph_site,
-                                          lignin_to_nitrogen=input$LNratio,structural_in_lignin=input$SLratio,woodylittersize=input$WLS,AWEN_in=AWEN_input,decomp_to_resist_ratio=DR_in,
-                                          CN_Ratio=input$CNratio, Bulk_Density=input$bulkdensity, WFPS=water_filled_pore_space, CH4_Conc=input$CH4_data,
-                                          decomposition_param_RothC=ksRothC,
-                                          decomposition_param_ICBM=param_ICBM,
-                                          decomposition_param_Century=ksCent,
-                                          decomposition_param_Yasso07=paramYasso07,
-                                          decomposition_param_Yasso20=paramYasso20)
-    
-    print("End of multimodel simulation RCP6.0")
-    print(" ")
-    print("...Plotting RCP6.0 completed...")
-    
-    data_mmRCP60_var <- get_data_from_multimodel_run(test_mmRCP60_var,t_fwd_col)
-    minCRCP60_var=data_mmRCP60_var[[1]]
-    maxCRCP60_var=data_mmRCP60_var[[2]]
-    mmmean_totCRCP60_var=data_mmRCP60_var[[3]]
-    totC_Roth_C_RCP60_var=data_mmRCP60_var[[4]]
-    totC_ICBM_C_RCP60_var=data_mmRCP60_var[[5]]
-    totC_Century_C_RCP60_var=data_mmRCP60_var[[6]]
-    totC_Yasso07_C_RCP60_var=data_mmRCP60_var[[7]]
-    totC_Yasso20_C_RCP60_var=data_mmRCP60_var[[8]]
-    minFRCP60_var=data_mmRCP60_var[[9]]
-    maxFRCP60_var=data_mmRCP60_var[[10]]
-    mmmean_totFRCP60_var=data_mmRCP60_var[[11]]
-    totF_Roth_C_RCP60_var=data_mmRCP60_var[[12]]
-    totF_ICBM_C_RCP60_var=data_mmRCP60_var[[13]]
-    totF_Century_C_RCP60_var=data_mmRCP60_var[[14]]
-    totF_Yasso07_C_RCP60_var=data_mmRCP60_var[[15]]
-    totF_Yasso20_C_RCP60_var=data_mmRCP60_var[[16]]
-    
-    totF_SG_C_RCP60_var=data_mmRCP60_var[[17]]
-    totCH4_SG_C_RCP60_var=data_mmRCP26_var[[18]]
-    totN2O_SG_C_RCP60_var=data_mmRCP60_var[[19]]
-    ###########################
-    #Plot STOCKS COMPARISON CC
-    ###########################
-    express_plotC = expression("SOC stocks (MgC"~{ha}^{-1}~")")
-    
-    minC <- min(cbind(minCRCP26_var,minCRCP60_var))
-    maxC <- max(cbind(maxCRCP26_var,maxCRCP60_var))
-    
-    t_fwd = seq(1,simulation_length_CCscenario,by=computation_time_step_fwd)
-    
-    plot(t_fwd, mmmean_totCRCP26_var, type="l", lty=1, lwd=3, xlab="Time (years)",ylab=" ",col="blue",ylim=c(minC-5,maxC+5))
-    lines(t_fwd,totC_Roth_C_RCP26_var,type="l", lty=1, lwd=1, col=alpha("blue",0.3))
-    lines(t_fwd,totC_ICBM_C_RCP26_var,type="l", lty=1,lwd=1, col=alpha("blue",0.3))
-    lines(t_fwd,totC_Century_C_RCP26_var,type="l", lty=1,lwd=1, col=alpha("blue",0.3))
-    lines(t_fwd,totC_Yasso07_C_RCP26_var,type="l", lty=1,lwd=1, col=alpha("blue",0.3))
-    lines(t_fwd,totC_YASSO20_C_RCP26_var,type="l", lty=1,lwd=1, col=alpha("blue",0.3))
-    title(ylab=express_plotC,main="Multi-model SOC stocks",mgp=c(2,1,0))
-    
-    lines(t_fwd,mmmean_totCRCP60_var,type="l", lty=1,lwd=3, col="red")
-    lines(t_fwd,totC_Roth_C_RCP60_var,type="l", lty=1,lwd=1, col=alpha("red",0.3))
-    lines(t_fwd,totC_ICBM_C_RCP60_var,type="l", lty=1,lwd=1, col=alpha("red",0.3))
-    lines(t_fwd,totC_Century_C_RCP60_var,type="l", lty=1,lwd=1, col=alpha("red",0.3))
-    lines(t_fwd,totC_Yasso07_C_RCP60_var,type="l", lty=1,lwd=1, col=alpha("red",0.3))
-    lines(t_fwd,totC_Yasso20_C_RCP60_var,type="l", lty=1,lwd=1, col=alpha("red",0.3))
-    
-    legend(par('usr')[2], par('usr')[4], c("RCP 2.6", "RCP 6.0"),
-           lty=1,lwd=c(3,3), col=c("blue","red"), cex=0.8,xpd=NA,bty="n")
-    
-    #PLOT FLUXES COMPARISON CC
-    express_plotF = expression(CO[2]~"flux (MgC"~{ha}^{-1}*{year}^{-1}~")")
-    
-    minF <- min(cbind(minFRCP26_var,minFRCP60_var))
-    maxF <- max(cbind(maxFRCP26_var,maxFRCP60_var))
-    
-    plot(t_fwd, mmmean_totFRCP26_var, type="l", lty=1, lwd=3, xlab="Time (years)",ylab=" ",col="blue",ylim=c(minF-2,maxF+2))
-    lines(t_fwd,totF_Roth_C_RCP26_var,type="l", lty=1, lwd=1, col=alpha("blue",0.3))
-    lines(t_fwd,totF_ICBM_C_RCP26_var,type="l", lty=1,lwd=1, col=alpha("blue",0.3))
-    lines(t_fwd,totF_Century_C_RCP26_var,type="l", lty=1,lwd=1, col=alpha("blue",0.3))
-    lines(t_fwd,totF_Yasso07_C_RCP26_var,type="l", lty=1,lwd=1, col=alpha("blue",0.3))
-    lines(t_fwd,totF_Yasso20_C_RCP26_var,type="l", lty=1,lwd=1, col=alpha("blue",0.3))
-    lines(t_fwd,totF_SG_C_RCP26_var,type="l", lty=1,lwd=1, col=alpha("blue",0.3))
-    title(ylab=express_plotF,main= expression(bold("Multi-model "~CO[2]~"fluxes")),mgp=c(2,1,0))
-    
-    lines(t_fwd,mmmean_totFRCP60_var,type="l", lty=1,lwd=3, col="red")
-    lines(t_fwd,totF_Roth_C_RCP60_var,type="l", lty=1,lwd=1, col=alpha("red",0.3))
-    lines(t_fwd,totF_ICBM_C_RCP60_var,type="l", lty=1,lwd=1, col=alpha("red",0.3))
-    lines(t_fwd,totF_Century_C_RCP60_var,type="l", lty=1,lwd=1, col=alpha("red",0.3))
-    lines(t_fwd,totF_Yasso07_C_RCP60_var,type="l", lty=1,lwd=1, col=alpha("red",0.3))
-    lines(t_fwd,totF_SG_C_RCP60_var,type="l", lty=1,lwd=1, col=alpha("red",0.3))
-    lines(t_fwd,totF_Yasso20_C_RCP60_var,type="l", lty=1,lwd=1, col=alpha("red",0.3))
-    
-    legend(par('usr')[2], par('usr')[4], c("RCP 2.6", "RCP 6.0"),
-           lty=1,lwd=c(3,3), col=c("blue","red"), cex=0.8,xpd=NA,bty="n")
     
     
-    ########################
-    ########################
-    #Create data for download
-    data_download_LUchange <-create_dataframe_for_download(t_fwd,
-                                                           data_mmRCP26_var,
-                                                           data_mmRCP60_var,
-                                                           "RCP2.6",
-                                                           "RCP6.0")
-    # Filter data based on user input
-    filtered_data_LUchange <- reactive({
+    # Create 0-row data frame which will be used to store data
+    dat <- data.frame(x = numeric(0), y = numeric(0))
+    ######################################################################################################
+    withProgress(message = 'Processing', value = 0, {
+      # Number of times we'll go through the loop
+      n_progr<-12
+      i_progr<-1
       
-      subset(data_download_LUchange,data_download_LUchange$Variable== input$Select_variable2
-             & data_download_LUchange$Scenario== input$Select_RCP2
-             & data_download_LUchange$Model== input$Select_model2)
-    })
-    
-    observe({
-      category_choices <- subset(data_download_LUchange,data_download_LUchange$Variable== input$Select_variable2)
-      updateSelectInput(session, "Select_model2", choices = unique(category_choices$Model))
-    })
-    
-    #Show data in table
-    output$outTable_LUchange <- renderDT({
-      datatable(filtered_data_LUchange(), options = list(pageLength = 10),
-                rownames = FALSE)
-    })
-    
-    # Downloadable csv of selected dataset ----
-    output$downloadData_LUchange <- downloadHandler(
-      filename = function() {
-        paste("data_", input$Select_variable2, "_", input$Select_RCP2, "_", input$Select_model2, ".csv", sep = "")
-      },
-      content = function(file) {
-        write.csv(filtered_data_LUchange(), file, row.names = FALSE)
-      }
-    )
-    
-    
-    
-  })
-  
-  
-  #--------------------------------------------------------------------------------
-  #RUNS THE SIMULATIONS LAND MANAGEMENT SCENARIO
-  #---------------------------------------------------------------------------------
-  
-  output$plot_land_management<- renderPlot({
-    #req(input$clay_slider3)
-    req(input$clay_slider2)
-    req(input$MR_slider)
-    req(input$HR_slider)
-    
-    print("Entering plot_land_management")
-    #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>#
-    #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>#
-    print("Retrieving climate data from user inputs")
-    #data_clim_user =upload_user_clim_data_site()
-    
-    #Fwd
-    # Potevap_month = data_clim_user[[1]]
-    # Temp_day = data_clim_user[[2]]
-    # Precip_day = data_clim_user[[3]]
-    # Vswc_day = data_clim_user[[4]]
-    #Fwd
-    Potevap_month = data_potevap()
-    Temp_day = data_temperature()
-    Precip_day = data_precipitation()
-    Vswc_day = data_vswc()
-    
-    # print("Potevap_month")
-    # print(head(Potevap_month))
-    # 
-    # print("Temp_day")
-    # print(head(Temp_day))
-    # 
-    # print("Precip_day")
-    # print(head(Precip_day))
-    # 
-    # print("Vswc_day")
-    # print(head(Vswc_day))
-    
-    #Spinup
-    #data_clim_user_spinup = upload_user_spinup_clim_data_site()
-    print("Creating spinup climate variables")
-    Potevap_month_spinup = data_potevap_spinup()
-    Temp_day_spinup = data_temp_spinup()
-    Precip_day_spinup = data_prec_spinup()
-    Vswc_day_spinup = data_vswc_spinup()
-    
-    # print("Potevap_month_spinup")
-    # print(head(Potevap_month_spinup))
-    # 
-    # print("Temp_day_spinup")
-    # print(head(Temp_day_spinup))
-    # 
-    # print("Precip_day_spinup")
-    # print(head(Precip_day_spinup))
-    # 
-    # print("Vswc_day_spinup")
-    # print(head(Vswc_day_spinup))
-    
-    
-    
-    #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<#
-    #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<#
-    
-    #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>#
-    
-    #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>#
-    print("Retrieving C input for control land-management")
-    
-    retreive_Cinput_ag_rcp26_fix=data_Cinput_ag()
-    retreive_Cinput_bg_rcp26_fix=data_Cinput_bg()
-    #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    #Cin TOT contol scenario (time series)
-    retreive_Cinput_rcp26_fix = retreive_Cinput_ag_rcp26_fix+retreive_Cinput_bg_rcp26_fix
-    print("retreive_Cinput_rcp26_fix")
-    print(retreive_Cinput_rcp26_fix)
-    
-    
-    print("Retrieving C biomass in vegetation to calculate C input after disturbance event")
-    ######################################################
-    #C input from died vegetation at year of disturbance
-    ######################################################
-    #cveg
-    #retreive_Cbiomass_rcp26 = retreive_Cbiomass(lon_veg_clitter_rcp26,lat_veg_clitter_rcp26,veg_clitter_time_rcp26,veg_clitter_rcp26,input$year_disturbance)
-    retreive_Cbiomass_rcp26_AG<-input$AG_biomass
-    retreive_Cbiomass_rcp26_BG<-input$BG_biomass
-    
-    Cinput_disturbance_vec<- calculate_Cin_mortality_event(retreive_Cinput_ag_rcp26_fix,retreive_Cinput_bg_rcp26_fix,
-                                                           retreive_Cbiomass_rcp26_AG, retreive_Cbiomass_rcp26_BG,input$MR_slider,input$HR_slider)
-    Cinput_disturbance_ag<-Cinput_disturbance_vec[[1]]
-    Cinput_disturbance_bg<-Cinput_disturbance_vec[[2]]
-    
-    Cinput_disturbance<-Cinput_disturbance_ag+Cinput_disturbance_bg
-    
-    print("Cinput_disturbance")
-    print(Cinput_disturbance)
-    
-    AWEN_input = c(as.numeric(input$A_pool),
-                   as.numeric(input$W_pool),
-                   as.numeric(input$E_pool),
-                   as.numeric(input$N_pool),
-                   0)
-    
-    #Suppose W and E litter compounds are more labile
-    decomposable_plant_material <-as.numeric(input$W_pool)+as.numeric(input$E_pool)
-    #Suppose A and N litter compounds are more resistant
-    resistant_plant_material <-as.numeric(input$A_pool)+as.numeric(input$N_pool)
-    #Decomposable to resistant ratio
-    DR_in = decomposable_plant_material/resistant_plant_material
-    
-    #CHANGE
-    computation_time_step_fwd = 1
-    simulation_length_LMscenario = simulation_length()
-    
-    ######
-    print("Preparing to run control land management scenario")
-    ######
-    #This will launch the function defined in "Holisoils_multimodel_v1.R"
-    test_mm_control_LM <-Call_MULTIMODEL_i1(plot_figures=plot_figures,simulation_length=simulation_length_LMscenario, spinup_length=spinup_length,
+      # Each time through the loop, add another row of data. This is
+      # a stand-in for a long-running computation.
+      dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+      # Increment the progress bar, and update the detail text.
+      incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+      #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>#
+      #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>#
+      #Run retreive_clim_data_site function to retrieve climate data for site
+      print("Retrieving climate data for site for climate scenarios")
+      #data_clim = retreive_clim_data_site()
+      # Potevap_month_spinup_rcp26=data_clim_potevap[[1]]
+      # Potevap_month_fwd_rcp26=data_clim_potevap[[4]]
+      # Potevap_month_fwd_rcp60=data_clim_potevap[[5]]
+      # Precip_day_spinup=data_clim_precip[[1]]
+      # Precip_day_fwd_rcp26=data_clim_precip[[4]]
+      # Precip_day_fwd_rcp60=data_clim_precip[[5]]
+      # Temp_day_spinup=data_clim_temp[[1]]
+      # Temp_day_fwd_rcp26=data_clim_temp[[4]]
+      # Temp_day_fwd_rcp60=data_clim_temp[[5]]
+      # Vswc_day_spinup=data_clim_vswc[[1]]
+      # Vswc_day_fwd_rcp26=data_clim_vswc[[4]]
+      # Vswc_day_fwd_rcp60=data_clim_vswc[[5]]
+      
+      data_clim_potevap<-retreive_clim_data_site_potevap()
+      Potevap_month_spinup_rcp26=data_clim_potevap[[1]]
+      Potevap_month_fwd_rcp26_sel=data_clim_potevap[[2]]
+      Potevap_month_fwd_rcp60_sel=data_clim_potevap[[3]]
+      
+      # Each time through the loop, add another row of data. This is
+      # a stand-in for a long-running computation.
+      dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+      # Increment the progress bar, and update the detail text.
+      i_progr<-i_progr+1
+      incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+      
+      data_clim_precip<-retreive_clim_data_site_precip()
+      Precip_day_spinup=data_clim_precip[[1]]
+      Precip_day_fwd_rcp26_sel=data_clim_precip[[2]]
+      Precip_day_fwd_rcp60_sel=data_clim_precip[[3]]
+      
+      # Each time through the loop, add another row of data. This is
+      # a stand-in for a long-running computation.
+      dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+      # Increment the progress bar, and update the detail text.
+      i_progr<-i_progr+1
+      incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+      
+      data_clim_temp<-retreive_clim_data_site_temp()
+      Temp_day_spinup=data_clim_temp[[1]]
+      Temp_day_fwd_rcp26_sel=data_clim_temp[[2]]
+      Temp_day_fwd_rcp60_sel=data_clim_temp[[3]]
+      
+      # Each time through the loop, add another row of data. This is
+      # a stand-in for a long-running computation.
+      dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+      # Increment the progress bar, and update the detail text.
+      i_progr<-i_progr+1
+      incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+      
+      data_clim_vswc<-retreive_clim_data_site_vswc()
+      Vswc_day_spinup=data_clim_vswc[[1]]
+      Vswc_day_fwd_rcp26_sel=data_clim_vswc[[2]]
+      Vswc_day_fwd_rcp60_sel=data_clim_vswc[[3]]
+      
+      # Each time through the loop, add another row of data. This is
+      # a stand-in for a long-running computation.
+      dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+      # Increment the progress bar, and update the detail text.
+      i_progr<-i_progr+1
+      incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+      #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<#
+      #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<#
+      
+      #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>#
+      #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>#
+      #Run retreive_Cinput function to retrieve Cinput for climate scenarios
+      print("Retrieving climate data for site for climate scenarios")
+      # #####
+      # #RCP26
+      # #####
+      
+      litter_file_rcp26<-nc_open("data/LITTER/npp_average_rcp26_EU_annual_2006_2099_fixed.nc4")
+      #litter_file_rcp26<-nc_open(paste0(temp_file,"/npp_average_rcp26_EU_annual_2006_2099_fixed.nc4"))
+      #----------------------------------------------------
+      #Read lon-lat-time variables
+      lon_litter_rcp26 <- ncvar_get(litter_file_rcp26, varid = "lon")
+      lat_litter_rcp26 <- ncvar_get(litter_file_rcp26, varid = "lat")
+      #Convert time to dates
+      litter_time_rcp26 <- as.Date("1661-1-1") %m+% years(litter_file_rcp26$dim$time$vals)
+      
+      #Retrieve variable for whole time length
+      litter_rcp26_npp <- ncvar_get(litter_file_rcp26, "npp") #kg/m2/sec
+      
+      #convert npp (#kg/m2/sec) to foliar Litterfall carbon with constant coefficient (see Neumann et al., 2018 and Malhi et al., 2011)
+      litter_rcp26_ag <- litter_rcp26_npp*0.34
+      #calculate belowground carbon input with equation from Jonard et al., 2007 fineroot_in (g/m2/yr) =0.333*(1.92*AG_litterfall(g/m2/yr)+130)
+      #where *1000*(60*60*24*365.25) is the conversion factor from kg/m2/sec to (g/m2/yr)
+      litter_rcp26_bg <- 0.333*(1.92*(litter_rcp26_ag*1000*(60*60*24*365.25))+130)/(1000*(60*60*24*365.25)) 
+      
+      retreive_Cinput_ag_rcp26_fix = retreive_Cinput(lon_litter_rcp26,lat_litter_rcp26,litter_time_rcp26,litter_rcp26_ag)
+      retreive_Cinput_bg_rcp26_fix = retreive_Cinput(lon_litter_rcp26,lat_litter_rcp26,litter_time_rcp26,litter_rcp26_bg)
+      retreive_Cinput_rcp26_fix = retreive_Cinput_ag_rcp26_fix+retreive_Cinput_bg_rcp26_fix
+      #retreive_Cinput_rcp26_fix_mean = mean(retreive_Cinput_rcp26_fix)
+      rm(litter_file_rcp26,lon_litter_rcp26,lat_litter_rcp26,litter_time_rcp26,litter_rcp26_ag,litter_rcp26_bg,litter_rcp26_npp)
+      
+      # Each time through the loop, add another row of data. This is
+      # a stand-in for a long-running computation.
+      dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+      # Increment the progress bar, and update the detail text.
+      i_progr<-i_progr+1
+      incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+      
+      # #####
+      # #RCP60
+      # ##### 
+      litter_file_rcp60<-nc_open("data/LITTER/npp_average_rcp60_EU_annual_2006_2099_fixed.nc4")
+      #litter_file_rcp60<-nc_open(paste0(temp_file,"/npp_average_rcp60_EU_annual_2006_2099_fixed.nc4"))
+      #----------------------------------------------------
+      #Read lon-lat-time variables
+      lon_litter_rcp60 <- ncvar_get(litter_file_rcp60, varid = "lon")
+      lat_litter_rcp60 <- ncvar_get(litter_file_rcp60, varid = "lat")
+      #Convert time to dates
+      litter_time_rcp60 <- as.Date("1661-1-1") %m+% years(litter_file_rcp60$dim$time$vals)
+      # #Convert time to dates
+      # litter_time_plot_rcp60 <- as.Date.character(format(litter_time_rcp60, "%Y-%m-%d"))
+      #Retrieve variable for whole time length
+      litter_rcp60_npp <- ncvar_get(litter_file_rcp60, "npp")
+      
+      #convert npp (#kg/m2/sec) to foliar Litterfall carbon with constant coefficient (see Neumann et al., 2018 and Malhi et al., 2011)
+      litter_rcp60_ag <- litter_rcp60_npp*0.34
+      #calculate belowground carbon input with equation from Jonard et al., 2007 fineroot_in (g/m2/yr) =0.333*(1.92*AG_litterfall(g/m2/yr)+130)
+      #where *1000*(60*60*24*365.25) is the conversion factor from kg/m2/sec to (g/m2/yr)
+      litter_rcp60_bg <- 0.333*(1.92*(litter_rcp60_ag*1000*(60*60*24*365.25))+130)/(1000*(60*60*24*365.25)) 
+      
+      retreive_Cinput_ag_rcp60_fix = retreive_Cinput(lon_litter_rcp60,lat_litter_rcp60,litter_time_rcp60,litter_rcp60_ag)
+      retreive_Cinput_bg_rcp60_fix = retreive_Cinput(lon_litter_rcp60,lat_litter_rcp60,litter_time_rcp60,litter_rcp60_bg)
+      retreive_Cinput_rcp60_fix=retreive_Cinput_ag_rcp60_fix+retreive_Cinput_bg_rcp60_fix
+      #retreive_Cinput_rcp60_fix_mean = mean(retreive_Cinput_rcp60_fix)
+      
+      rm(litter_file_rcp60,lon_litter_rcp60,lat_litter_rcp60,litter_time_rcp60,litter_rcp60_ag,litter_rcp60_bg,litter_rcp60_npp)
+      
+      # Each time through the loop, add another row of data. This is
+      # a stand-in for a long-running computation.
+      dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+      # Increment the progress bar, and update the detail text.
+      i_progr<-i_progr+1
+      incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+      
+      #----------------------------------------------------
+      #Read NPP DATA with variable land use
+      #----------------------------------------------------
+      # #####
+      # #RCP26 var
+      # #####
+      
+      litter_LU_file_rcp26<-nc_open("data/LITTER/npp_average_rcp26_EU_annual_2006_2099_var.nc4")
+      #litter_LU_file_rcp26<-nc_open(paste0(temp_file,"/npp_average_rcp26_EU_annual_2006_2099_var.nc4"))
+      #----------------------------------------------------
+      #Read lon-lat-time variables
+      lon_litter_LU_rcp26 <- ncvar_get(litter_LU_file_rcp26, varid = "lon")
+      lat_litter_LU_rcp26 <- ncvar_get(litter_LU_file_rcp26, varid = "lat")
+      #Convert time to dates
+      litter_LU_time_rcp26 <- as.Date("1661-1-1") %m+% years(as.integer(litter_LU_file_rcp26$dim$time$vals))
+      #Convert time to dates
+      #litter_LU_time_plot_rcp26 <- as.Date.character(format(litter_LU_time_rcp26, "%Y-%m-%d"))
+      #Retrieve variable for whole time length
+      litter_LU_rcp26_npp <- ncvar_get(litter_LU_file_rcp26, "npp")
+      
+      #convert npp (#kg/m2/sec) to foliar Litterfall carbon with constant coefficient (see Neumann et al., 2018 and Malhi et al., 2011)
+      litter_LU_rcp26_ag <- litter_LU_rcp26_npp*0.34
+      #calculate belowground carbon input with equation from Jonard et al., 2007 fineroot_in (g/m2/yr) =0.333*(1.92*AG_litterfall(g/m2/yr)+130)
+      #where *1000*(60*60*24*365.25) is the conversion factor from kg/m2/sec to (g/m2/yr)
+      litter_LU_rcp26_bg <- 0.333*(1.92*(litter_LU_rcp26_ag*1000*(60*60*24*365.25))+130)/(1000*(60*60*24*365.25)) 
+      retreive_Cinput_ag_rcp26_var = retreive_Cinput(lon_litter_LU_rcp26,lat_litter_LU_rcp26,litter_LU_time_rcp26,litter_LU_rcp26_ag)
+      retreive_Cinput_bg_rcp26_var = retreive_Cinput(lon_litter_LU_rcp26,lat_litter_LU_rcp26,litter_LU_time_rcp26,litter_LU_rcp26_bg)
+      retreive_Cinput_rcp26_var = retreive_Cinput_ag_rcp26_var+retreive_Cinput_bg_rcp26_var
+      #retreive_Cinput_rcp26_var_mean = mean(retreive_Cinput_rcp26_var)
+      
+      rm(litter_LU_file_rcp26,lon_litter_LU_rcp26,lat_litter_LU_rcp26,litter_LU_time_rcp26,litter_LU_rcp26_ag,litter_LU_rcp26_bg,litter_LU_rcp26_npp)
+      
+      # Each time through the loop, add another row of data. This is
+      # a stand-in for a long-running computation.
+      dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+      # Increment the progress bar, and update the detail text.
+      i_progr<-i_progr+1
+      incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+      
+      # #####
+      # #RCP60
+      # #####
+      litter_LU_file_rcp60<-nc_open("data/LITTER/npp_average_rcp60_EU_annual_2006_2099_var.nc4")
+      #litter_LU_file_rcp60<-nc_open(paste0(temp_file,"/npp_average_rcp60_EU_annual_2006_2099_var.nc4"))
+      #----------------------------------------------------
+      #Read lon-lat-time variables
+      lon_litter_LU_rcp60 <- ncvar_get(litter_LU_file_rcp60, varid = "lon")
+      lat_litter_LU_rcp60 <- ncvar_get(litter_LU_file_rcp60, varid = "lat")
+      #Convert time to dates
+      litter_LU_time_rcp60 <- as.Date("1661-1-1") %m+% years(as.integer(litter_LU_file_rcp60$dim$time$vals))
+      #Convert time to dates
+      #litter_LU_time_plot_rcp60 <- as.Date.character(format(litter_LU_time_rcp60, "%Y-%m-%d"))
+      #Retrieve variable for whole time length
+      litter_LU_rcp60_npp <- ncvar_get(litter_LU_file_rcp60, "npp")
+      
+      #convert npp (#kg/m2/sec) to foliar Litterfall carbon with constant coefficient (see Neumann et al., 2018 and Malhi et al., 2011)
+      litter_LU_rcp60_ag <- litter_LU_rcp60_npp*0.34
+      #calculate belowground carbon input with equation from Jonard et al., 2007 fineroot_in (g/m2/yr) =0.333*(1.92*AG_litterfall(g/m2/yr)+130)
+      #where *1000*(60*60*24*365.25) is the conversion factor from kg/m2/sec to (g/m2/yr)
+      litter_LU_rcp60_bg <- 0.333*(1.92*(litter_LU_rcp60_ag*1000*(60*60*24*365.25))+130)/(1000*(60*60*24*365.25)) 
+      
+      retreive_Cinput_ag_rcp60_var = retreive_Cinput(lon_litter_LU_rcp60,lat_litter_LU_rcp60,litter_LU_time_rcp60,litter_LU_rcp60_ag)
+      retreive_Cinput_bg_rcp60_var = retreive_Cinput(lon_litter_LU_rcp60,lat_litter_LU_rcp60,litter_LU_time_rcp60,litter_LU_rcp60_bg)
+      retreive_Cinput_rcp60_var = retreive_Cinput_ag_rcp60_var+retreive_Cinput_bg_rcp60_var
+      
+      rm(litter_LU_file_rcp60,lon_litter_LU_rcp60,lat_litter_LU_rcp60,litter_LU_time_rcp60,litter_LU_rcp60_ag,litter_LU_rcp60_bg,litter_LU_rcp60_npp)
+      #retreive_Cinput_rcp60_var_mean = mean(retreive_Cinput_rcp60_var)
+      
+      # Each time through the loop, add another row of data. This is
+      # a stand-in for a long-running computation.
+      dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+      # Increment the progress bar, and update the detail text.
+      i_progr<-i_progr+1
+      incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+      
+      AWEN_input = c(as.numeric(input$A_pool),
+                     as.numeric(input$W_pool),
+                     as.numeric(input$E_pool),
+                     as.numeric(input$N_pool),
+                     0)
+      #Suppose W and E litter compounds are more labile
+      decomposable_plant_material <-as.numeric(input$W_pool)+as.numeric(input$E_pool)
+      #Suppose A and N litter compounds are more resistant
+      resistant_plant_material <-as.numeric(input$A_pool)+as.numeric(input$N_pool)
+      #Decomposable to resistant ratio
+      DR_in = decomposable_plant_material/resistant_plant_material
+      
+      #CHANGE
+      computation_time_step_fwd = 1
+      #simulation_length_CCscenario = length(Potevap_month_fwd_rcp26$Date)/12
+      simulation_length_CCscenario=simulation_length()
+      ######
+      print("Preparing to run RCP26")
+      ######
+      #This will launch the function defined in "Holisoils_multimodel_v1.R"
+      test_mmRCP26_var <-Call_MULTIMODEL_i1(plot_figures=plot_figures,simulation_length=simulation_length_CCscenario, spinup_length=spinup_length,
                                             computation_time_step_fwd=computation_time_step_fwd,
-                                            start_date_simulations=dates_in(),
-                                            temperature_spinup=Temp_day_spinup, precipitation_spinup=Precip_day_spinup, potential_evapotranspiration_spinup=Potevap_month_spinup,
+                                            #computation_time_step_fwd=1, computation_time_step_spinup=1, tolti, perche ogni modello ha il suo gia predefinito
+                                            start_date_simulations=Prec_month_spinup_rcp26$Date[1],
+                                            temperature_spinup=Temp_day_spinup, precipitation_spinup=Precip_day_spinup, potential_evapotranspiration_spinup=Potevap_month_spinup_rcp26,
                                             soilmoisture_spinup=as.numeric(Vswc_day_spinup$Vswc),
-                                            temperature_fwd=Temp_day, precipitation_fwd=Precip_day, potential_evapotranspiration_fwd=Potevap_month,soilmoisture_fwd=as.numeric(Vswc_day$Vswc),
+                                            #soilmoisture_spinup=as.numeric(Vswc_day_spinup$Vswc),
+                                            temperature_fwd=Temp_day_fwd_rcp26_sel, precipitation_fwd=Precip_day_fwd_rcp26_sel, potential_evapotranspiration_fwd=Potevap_month_fwd_rcp26_sel,soilmoisture_fwd=as.numeric(Vswc_day_fwd_rcp26_sel$Vswc),
+                                            #soilmoisture_fwd=as.numeric(Vswc_day_fwd$Vswc),
                                             SOC_0=input$SOC,
-                                            C_input_ag_spinup=as.numeric(mean(retreive_Cinput_ag_rcp26_fix)),C_input_bg_spinup=as.numeric(mean(retreive_Cinput_bg_rcp26_fix)),
-                                            C_input_ag_fwd=as.numeric(retreive_Cinput_ag_rcp26_fix),C_input_bg_fwd=as.numeric(retreive_Cinput_bg_rcp26_fix),
+                                            C_input_ag_spinup=as.numeric(mean(retreive_Cinput_ag_rcp26_var)),C_input_bg_spinup=as.numeric(mean(retreive_Cinput_bg_rcp26_var)),
+                                            C_input_ag_fwd=as.numeric(retreive_Cinput_ag_rcp26_var),C_input_bg_fwd=as.numeric(retreive_Cinput_bg_rcp26_var),
+                                            #clay_p=input$clay,silt_p=input$silt,soil_thickness=input$soilthick,pH_p=ph_site,
                                             clay_p=input$clay_slider2,silt_p=input$silt,soil_thickness=input$soilthick,pH_p=ph_site,
                                             lignin_to_nitrogen=input$LNratio,structural_in_lignin=input$SLratio,woodylittersize=input$WLS,AWEN_in=AWEN_input,decomp_to_resist_ratio=DR_in,
                                             CN_Ratio=input$CNratio, Bulk_Density=input$bulkdensity, WFPS=water_filled_pore_space, CH4_Conc=input$CH4_data,
@@ -4703,179 +5730,610 @@ server <- function(input, output,session) {
                                             decomposition_param_Century=ksCent,
                                             decomposition_param_Yasso07=paramYasso07,
                                             decomposition_param_Yasso20=paramYasso20)
-    
-    print("End of multimodel simulation Control LM")
-    print(" ")
-    print("...Plotting control LM completed...")
-    
-    t_fwd_col = seq.int(1,simulation_length_LMscenario,by=computation_time_step_fwd)
-    
-    
-    data_mmctrLM <- get_data_from_multimodel_run(test_mm_control_LM,t_fwd_col)
-    minCctrLM=data_mmctrLM[[1]]
-    maxCctrLM=data_mmctrLM[[2]]
-    mmmean_totCctrLM=data_mmctrLM[[3]]
-    totC_Roth_C_ctrLM=data_mmctrLM[[4]]
-    totC_ICBM_C_ctrLM=data_mmctrLM[[5]]
-    totC_Century_C_ctrLM=data_mmctrLM[[6]]
-    totC_Yasso07_C_ctrLM=data_mmctrLM[[7]]
-    totC_YASSO20_C_ctrLM=data_mmctrLM[[8]]
-    minFctrLM=data_mmctrLM[[9]]
-    maxFctrLM=data_mmctrLM[[10]]
-    mmmean_totFctrLM=data_mmctrLM[[11]]
-    totF_Roth_C_ctrLM=data_mmctrLM[[12]]
-    totF_ICBM_C_ctrLM=data_mmctrLM[[13]]
-    totF_Century_C_ctrLM=data_mmctrLM[[14]]
-    totF_Yasso07_C_ctrLM=data_mmctrLM[[15]]
-    totF_YASSO20_C_ctrLM=data_mmctrLM[[16]]
-    
-    totF_SG_C_ctrLM=data_mmctrLM[[17]]
-    totCH4_SG_C_ctrLM=data_mmctrLM[[18]]
-    totN2O_SG_C_ctrLM=data_mmctrLM[[19]]
-    
-    ###########################    ###########################
-    print("Preparing to run disturbance event scenario")
-    ###########################    ###########################
-    #This will launch the function defined in "Holisoils_multimodel_v1.R"
-    test_mm_disturbance_LM <- Call_MULTIMODEL_i1(plot_figures=plot_figures,simulation_length=simulation_length_LMscenario, spinup_length=spinup_length,
-                                                 computation_time_step_fwd=computation_time_step_fwd,
-                                                 start_date_simulations=dates_in(),
-                                                 temperature_spinup=Temp_day_spinup, precipitation_spinup=Precip_day_spinup, potential_evapotranspiration_spinup=Potevap_month_spinup,
-                                                 soilmoisture_spinup=as.numeric(Vswc_day_spinup$Vswc),
-                                                 temperature_fwd=Temp_day, precipitation_fwd=Precip_day, potential_evapotranspiration_fwd=Potevap_month,soilmoisture_fwd=as.numeric(Vswc_day$Vswc),
-                                                 SOC_0=input$SOC,
-                                                 C_input_ag_spinup=as.numeric(mean(retreive_Cinput_ag_rcp26_fix)),C_input_bg_spinup=as.numeric(mean(retreive_Cinput_bg_rcp26_fix)),
-                                                 C_input_ag_fwd=as.numeric(Cinput_disturbance_ag),C_input_bg_fwd=as.numeric(Cinput_disturbance_bg),
-                                                 clay_p=input$clay_slider2,silt_p=input$silt,soil_thickness=input$soilthick,pH_p=ph_site,
-                                                 lignin_to_nitrogen=input$LNratio,structural_in_lignin=input$SLratio,woodylittersize=input$WLS,AWEN_in=AWEN_input,decomp_to_resist_ratio=DR_in,
-                                                 CN_Ratio=input$CNratio, Bulk_Density=input$bulkdensity, WFPS=water_filled_pore_space, CH4_Conc=input$CH4_data,
-                                                 decomposition_param_RothC=ksRothC,
-                                                 decomposition_param_ICBM=param_ICBM,
-                                                 decomposition_param_Century=ksCent,
-                                                 decomposition_param_Yasso07=paramYasso07,
-                                                 decomposition_param_Yasso20=paramYasso20)
-    
-    print("End of multimodel simulation disturbance event scenario")
-    print(" ")
-    print("...Plotting disturbance event scenario completed...")
-    
-    data_mmdistLM <- get_data_from_multimodel_run(test_mm_disturbance_LM,t_fwd_col)
-    minCdistLM=data_mmdistLM[[1]]
-    maxCdistLM=data_mmdistLM[[2]]
-    mmmean_totCdistLM=data_mmdistLM[[3]]
-    totC_Roth_C_distLM=data_mmdistLM[[4]]
-    totC_ICBM_C_distLM=data_mmdistLM[[5]]
-    totC_Century_C_distLM=data_mmdistLM[[6]]
-    totC_Yasso07_C_distLM=data_mmdistLM[[7]]
-    totC_YASSO20_C_distLM=data_mmdistLM[[8]]
-    minFdistLM=data_mmdistLM[[9]]
-    maxFdistLM=data_mmdistLM[[10]]
-    mmmean_totFdistLM=data_mmdistLM[[11]]
-    totF_Roth_C_distLM=data_mmdistLM[[12]]
-    totF_ICBM_C_distLM=data_mmdistLM[[13]]
-    totF_Century_C_distLM=data_mmdistLM[[14]]
-    totF_Yasso07_C_distLM=data_mmdistLM[[15]]
-    totF_YASSO20_C_distLM=data_mmdistLM[[16]]
-    
-    totF_SG_C_distLM=data_mmdistLM[[17]]
-    totCH4_SG_C_distLM=data_mmdistLM[[18]]
-    totN2O_SG_C_distLM=data_mmdistLM[[19]]
-    
-    ###########################
-    #Plot STOCKS COMPARISON CC
-    ###########################
-    express_plotC = expression("SOC stocks (MgC"~{ha}^{-1}~")")
-    
-    minC <- min(cbind(minCctrLM,minCdistLM))
-    maxC <- max(cbind(maxCctrLM,maxCdistLM))
-    
-    t_fwd = seq(1,simulation_length_LMscenario,by=computation_time_step_fwd)
-    
-    plot(t_fwd, mmmean_totCctrLM, type="l", lty=1, lwd=3, xlab="Time (years)",ylab=" ",col="black",ylim=c(minC-5,maxC+5))
-    lines(t_fwd,totC_Roth_C_ctrLM,type="l", lty=1, lwd=1, col=alpha("black",0.3))
-    lines(t_fwd,totC_ICBM_C_ctrLM,type="l", lty=1,lwd=1, col=alpha("black",0.3))
-    lines(t_fwd,totC_Century_C_ctrLM,type="l", lty=1,lwd=1, col=alpha("black",0.3))
-    lines(t_fwd,totC_Yasso07_C_ctrLM,type="l", lty=1,lwd=1, col=alpha("black",0.3))
-    lines(t_fwd,totC_YASSO20_C_ctrLM,type="l", lty=1,lwd=1, col=alpha("black",0.3))
-    title(ylab=express_plotC,main="Multi-model SOC stocks",mgp=c(2,1,0))
-    
-    lines(t_fwd,mmmean_totCdistLM,type="l", lty=1,lwd=3, col="darkgreen")
-    lines(t_fwd,totC_Roth_C_distLM,type="l", lty=1,lwd=1, col=alpha("darkgreen",0.3))
-    lines(t_fwd,totC_ICBM_C_distLM,type="l", lty=1,lwd=1, col=alpha("darkgreen",0.3))
-    lines(t_fwd,totC_Century_C_distLM,type="l", lty=1,lwd=1, col=alpha("darkgreen",0.3))
-    lines(t_fwd,totC_Yasso07_C_distLM,type="l", lty=1,lwd=1, col=alpha("darkgreen",0.3))
-    lines(t_fwd,totC_YASSO20_C_distLM,type="l", lty=1,lwd=1, col=alpha("darkgreen",0.3))
-    
-    legend(par('usr')[2], par('usr')[4], c("Control", "Disturbance"),
-           lty=1,lwd=c(3,3), col=c("black","darkgreen"), cex=0.8,xpd=NA,bty="n")
-    
-    #PLOT FLUXES COMPARISON CC
-    express_plotF = expression(CO[2]~"flux (MgC"~{ha}^{-1}*{year}^{-1}~")")
-    
-    minF <- min(cbind(minFctrLM,minFdistLM))
-    maxF <- max(cbind(maxFctrLM,maxFdistLM))
-    
-    plot(t_fwd, mmmean_totFctrLM, type="l", lty=1, lwd=3, xlab="Time (years)",ylab=" ",col="black",ylim=c(minF-2,maxF+2))
-    lines(t_fwd,totF_Roth_C_ctrLM,type="l", lty=1, lwd=1, col=alpha("black",0.3))
-    lines(t_fwd,totF_ICBM_C_ctrLM,type="l", lty=1,lwd=1, col=alpha("black",0.3))
-    lines(t_fwd,totF_Century_C_ctrLM,type="l", lty=1,lwd=1, col=alpha("black",0.3))
-    lines(t_fwd,totF_Yasso07_C_ctrLM,type="l", lty=1,lwd=1, col=alpha("black",0.3))
-    lines(t_fwd,totF_YASSO20_C_ctrLM,type="l", lty=1,lwd=1, col=alpha("black",0.3))
-    lines(t_fwd,totF_SG_C_ctrLM,type="l", lty=1,lwd=1, col=alpha("black",0.3))
-    title(ylab=express_plotF,main= expression(bold("Multi-model "~CO[2]~"fluxes")),mgp=c(2,1,0))
-    
-    lines(t_fwd,mmmean_totFdistLM,type="l", lty=1,lwd=3, col="darkgreen")
-    lines(t_fwd,totF_Roth_C_distLM,type="l", lty=1,lwd=1, col=alpha("darkgreen",0.3))
-    lines(t_fwd,totF_ICBM_C_distLM,type="l", lty=1,lwd=1, col=alpha("darkgreen",0.3))
-    lines(t_fwd,totF_Century_C_distLM,type="l", lty=1,lwd=1, col=alpha("darkgreen",0.3))
-    lines(t_fwd,totF_Yasso07_C_distLM,type="l", lty=1,lwd=1, col=alpha("darkgreen",0.3))
-    lines(t_fwd,totF_YASSO20_C_distLM,type="l", lty=1,lwd=1, col=alpha("darkgreen",0.3))
-    lines(t_fwd,totF_SG_C_distLM,type="l", lty=1,lwd=1, col=alpha("darkgreen",0.3))
-    
-    legend(par('usr')[2], par('usr')[4], c("Control", "Disturbance"),
-           lty=1,lwd=c(3,3), col=c("black","darkgreen"), cex=0.8,xpd=NA,bty="n")
-    
-    
-    
-    
-    ########################
-    ########################
-    #Create data for download
-    data_download_LM <-create_dataframe_for_download(t_fwd,
-                                                     data_mmctrLM,
-                                                     data_mmdistLM,
-                                                     "Control",
-                                                     "Disturbance")
-    # Filter data based on user input
-    filtered_data_LM <- reactive({
       
-      subset(data_download_LM,data_download_LM$Variable== input$Select_variable3
-             & data_download_LM$Scenario== input$Select_RCP3
-             & data_download_LM$Model== input$Select_model3)
+      print("End of multimodel simulation RCP2.6")
+      print(" ")
+      print("...Plotting RCP2.6 completed...")
+      
+      # Each time through the loop, add another row of data. This is
+      # a stand-in for a long-running computation.
+      dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+      # Increment the progress bar, and update the detail text.
+      i_progr<-i_progr+1
+      incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+      
+      t_fwd_col = seq.int(1,simulation_length_CCscenario,by=computation_time_step_fwd)
+      
+      data_mmRCP26_var <- get_data_from_multimodel_run(test_mmRCP26_var,t_fwd_col)
+      minCRCP26_var=data_mmRCP26_var[[1]]
+      maxCRCP26_var=data_mmRCP26_var[[2]]
+      mmmean_totCRCP26_var=data_mmRCP26_var[[3]]
+      totC_Roth_C_RCP26_var=data_mmRCP26_var[[4]]
+      totC_ICBM_C_RCP26_var=data_mmRCP26_var[[5]]
+      totC_Century_C_RCP26_var=data_mmRCP26_var[[6]]
+      totC_Yasso07_C_RCP26_var=data_mmRCP26_var[[7]]
+      totC_YASSO20_C_RCP26_var=data_mmRCP26_var[[8]]
+      minFRCP26_var=data_mmRCP26_var[[9]]
+      maxFRCP26_var=data_mmRCP26_var[[10]]
+      mmmean_totFRCP26_var=data_mmRCP26_var[[11]]
+      totF_Roth_C_RCP26_var=data_mmRCP26_var[[12]]
+      totF_ICBM_C_RCP26_var=data_mmRCP26_var[[13]]
+      totF_Century_C_RCP26_var=data_mmRCP26_var[[14]]
+      totF_Yasso07_C_RCP26_var=data_mmRCP26_var[[15]]
+      totF_Yasso20_C_RCP26_var=data_mmRCP26_var[[16]]
+      
+      totF_SG_C_RCP26_var=data_mmRCP26_var[[17]]
+      totCH4_SG_C_RCP26_var=data_mmRCP26_var[[18]]
+      totN2O_SG_C_RCP26_var=data_mmRCP26_var[[19]]
+      
+      ###########################    ###########################
+      print("Preparing to run RCP60")
+      ###########################    ###########################
+      #This will launch the function defined in "Holisoils_multimodel_v1.R"
+      test_mmRCP60_var <-Call_MULTIMODEL_i1(plot_figures=plot_figures,simulation_length=simulation_length_CCscenario, spinup_length=spinup_length,
+                                            computation_time_step_fwd=computation_time_step_fwd,
+                                            #computation_time_step_fwd=1, computation_time_step_spinup=1, tolti, perche ogni modello ha il suo gia predefinito
+                                            start_date_simulations=Prec_month_spinup_rcp26$Date[1],
+                                            temperature_spinup=Temp_day_spinup, precipitation_spinup=Precip_day_spinup, potential_evapotranspiration_spinup=Potevap_month_spinup_rcp26,
+                                            soilmoisture_spinup=as.numeric(Vswc_day_spinup$Vswc),
+                                            temperature_fwd=Temp_day_fwd_rcp60_sel, precipitation_fwd=Precip_day_fwd_rcp60_sel, potential_evapotranspiration_fwd=Potevap_month_fwd_rcp60_sel,soilmoisture_fwd=as.numeric(Vswc_day_fwd_rcp60_sel$Vswc),
+                                            SOC_0=input$SOC,
+                                            C_input_ag_spinup=as.numeric(mean(retreive_Cinput_ag_rcp60_var)),C_input_bg_spinup=as.numeric(mean(retreive_Cinput_bg_rcp60_var)),
+                                            C_input_ag_fwd=as.numeric(retreive_Cinput_ag_rcp60_var),C_input_bg_fwd=as.numeric(retreive_Cinput_bg_rcp60_var),
+                                            clay_p=input$clay_slider2,silt_p=input$silt,soil_thickness=input$soilthick,pH_p=ph_site,
+                                            lignin_to_nitrogen=input$LNratio,structural_in_lignin=input$SLratio,woodylittersize=input$WLS,AWEN_in=AWEN_input,decomp_to_resist_ratio=DR_in,
+                                            CN_Ratio=input$CNratio, Bulk_Density=input$bulkdensity, WFPS=water_filled_pore_space, CH4_Conc=input$CH4_data,
+                                            decomposition_param_RothC=ksRothC,
+                                            decomposition_param_ICBM=param_ICBM,
+                                            decomposition_param_Century=ksCent,
+                                            decomposition_param_Yasso07=paramYasso07,
+                                            decomposition_param_Yasso20=paramYasso20)
+      
+      print("End of multimodel simulation RCP6.0")
+      print(" ")
+      print("...Plotting RCP6.0 completed...")
+      
+      # Each time through the loop, add another row of data. This is
+      # a stand-in for a long-running computation.
+      dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+      # Increment the progress bar, and update the detail text.
+      i_progr<-i_progr+1
+      incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+      
+      
+      
+      data_mmRCP60_var <- get_data_from_multimodel_run(test_mmRCP60_var,t_fwd_col)
+      minCRCP60_var=data_mmRCP60_var[[1]]
+      maxCRCP60_var=data_mmRCP60_var[[2]]
+      mmmean_totCRCP60_var=data_mmRCP60_var[[3]]
+      totC_Roth_C_RCP60_var=data_mmRCP60_var[[4]]
+      totC_ICBM_C_RCP60_var=data_mmRCP60_var[[5]]
+      totC_Century_C_RCP60_var=data_mmRCP60_var[[6]]
+      totC_Yasso07_C_RCP60_var=data_mmRCP60_var[[7]]
+      totC_Yasso20_C_RCP60_var=data_mmRCP60_var[[8]]
+      minFRCP60_var=data_mmRCP60_var[[9]]
+      maxFRCP60_var=data_mmRCP60_var[[10]]
+      mmmean_totFRCP60_var=data_mmRCP60_var[[11]]
+      totF_Roth_C_RCP60_var=data_mmRCP60_var[[12]]
+      totF_ICBM_C_RCP60_var=data_mmRCP60_var[[13]]
+      totF_Century_C_RCP60_var=data_mmRCP60_var[[14]]
+      totF_Yasso07_C_RCP60_var=data_mmRCP60_var[[15]]
+      totF_Yasso20_C_RCP60_var=data_mmRCP60_var[[16]]
+      
+      totF_SG_C_RCP60_var=data_mmRCP60_var[[17]]
+      totCH4_SG_C_RCP60_var=data_mmRCP26_var[[18]]
+      totN2O_SG_C_RCP60_var=data_mmRCP60_var[[19]]
+      ###########################
+      #Plot STOCKS COMPARISON CC
+      ###########################
+      express_plotC = expression("SOC stocks (MgC"~{ha}^{-1}~")")
+      
+      minC <- min(cbind(minCRCP26_var,minCRCP60_var))
+      maxC <- max(cbind(maxCRCP26_var,maxCRCP60_var))
+      
+      t_fwd = seq(1,simulation_length_CCscenario,by=computation_time_step_fwd)
+
+      par(mar=c(6, 4, 4, 3))
+      
+      plot(t_fwd, mmmean_totCRCP26_var, type="l", lty=1, lwd=3, xlab="Time (years)",ylab=" ",col="blue",ylim=c(minC-5,maxC+5))
+      lines(t_fwd,totC_Roth_C_RCP26_var,type="l", lty=1, lwd=1, col=alpha("blue",0.3))
+      lines(t_fwd,totC_ICBM_C_RCP26_var,type="l", lty=1,lwd=1, col=alpha("blue",0.3))
+      lines(t_fwd,totC_Century_C_RCP26_var,type="l", lty=1,lwd=1, col=alpha("blue",0.3))
+      lines(t_fwd,totC_Yasso07_C_RCP26_var,type="l", lty=1,lwd=1, col=alpha("blue",0.3))
+      lines(t_fwd,totC_YASSO20_C_RCP26_var,type="l", lty=1,lwd=1, col=alpha("blue",0.3))
+      title(ylab=express_plotC,main="Multi-model SOC stocks",mgp=c(2,1,0))
+      
+      lines(t_fwd,mmmean_totCRCP60_var,type="l", lty=1,lwd=3, col="red")
+      lines(t_fwd,totC_Roth_C_RCP60_var,type="l", lty=1,lwd=1, col=alpha("red",0.3))
+      lines(t_fwd,totC_ICBM_C_RCP60_var,type="l", lty=1,lwd=1, col=alpha("red",0.3))
+      lines(t_fwd,totC_Century_C_RCP60_var,type="l", lty=1,lwd=1, col=alpha("red",0.3))
+      lines(t_fwd,totC_Yasso07_C_RCP60_var,type="l", lty=1,lwd=1, col=alpha("red",0.3))
+      lines(t_fwd,totC_Yasso20_C_RCP60_var,type="l", lty=1,lwd=1, col=alpha("red",0.3))
+      
+      legend(par('usr')[2], par('usr')[4], c("RCP 2.6", "RCP 6.0"),
+             lty=1,lwd=c(3,3), col=c("blue","red"), cex=1,xpd=NA,bty="n")
+      
+      #PLOT FLUXES COMPARISON CC
+      express_plotF = expression(CO[2]~"flux (MgC"~{ha}^{-1}*{year}^{-1}~")")
+      
+      minF <- min(cbind(minFRCP26_var,minFRCP60_var))
+      maxF <- max(cbind(maxFRCP26_var,maxFRCP60_var))
+      
+      plot(t_fwd, mmmean_totFRCP26_var, type="l", lty=1, lwd=3, xlab="Time (years)",ylab=" ",col="blue",ylim=c(minF-2,maxF+2))
+      lines(t_fwd,totF_Roth_C_RCP26_var,type="l", lty=1, lwd=1, col=alpha("blue",0.3))
+      lines(t_fwd,totF_ICBM_C_RCP26_var,type="l", lty=1,lwd=1, col=alpha("blue",0.3))
+      lines(t_fwd,totF_Century_C_RCP26_var,type="l", lty=1,lwd=1, col=alpha("blue",0.3))
+      lines(t_fwd,totF_Yasso07_C_RCP26_var,type="l", lty=1,lwd=1, col=alpha("blue",0.3))
+      lines(t_fwd,totF_Yasso20_C_RCP26_var,type="l", lty=1,lwd=1, col=alpha("blue",0.3))
+      lines(t_fwd,totF_SG_C_RCP26_var,type="l", lty=1,lwd=1, col=alpha("blue",0.3))
+      title(ylab=express_plotF,main= expression(bold("Multi-model "~CO[2]~"fluxes")),mgp=c(2,1,0))
+      
+      lines(t_fwd,mmmean_totFRCP60_var,type="l", lty=1,lwd=3, col="red")
+      lines(t_fwd,totF_Roth_C_RCP60_var,type="l", lty=1,lwd=1, col=alpha("red",0.3))
+      lines(t_fwd,totF_ICBM_C_RCP60_var,type="l", lty=1,lwd=1, col=alpha("red",0.3))
+      lines(t_fwd,totF_Century_C_RCP60_var,type="l", lty=1,lwd=1, col=alpha("red",0.3))
+      lines(t_fwd,totF_Yasso07_C_RCP60_var,type="l", lty=1,lwd=1, col=alpha("red",0.3))
+      lines(t_fwd,totF_SG_C_RCP60_var,type="l", lty=1,lwd=1, col=alpha("red",0.3))
+      lines(t_fwd,totF_Yasso20_C_RCP60_var,type="l", lty=1,lwd=1, col=alpha("red",0.3))
+      
+      legend(par('usr')[2], par('usr')[4], c("RCP 2.6", "RCP 6.0"),
+             lty=1,lwd=c(3,3), col=c("blue","red"), cex=1,xpd=NA,bty="n")
+      
+      # Each time through the loop, add another row of data. This is
+      # a stand-in for a long-running computation.
+      dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+      # Increment the progress bar, and update the detail text.
+      i_progr<-i_progr+1
+      incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+      
+      ########################
+      ########################
+      #Create data for download
+      data_download_LUchange <-create_dataframe_for_download(t_fwd,
+                                                             data_mmRCP26_var,
+                                                             data_mmRCP60_var,
+                                                             "RCP2.6",
+                                                             "RCP6.0")
+      # Filter data based on user input
+      filtered_data_LUchange <- reactive({
+        
+        subset(data_download_LUchange,data_download_LUchange$Variable== input$Select_variable2
+               & data_download_LUchange$Scenario== input$Select_RCP2
+               & data_download_LUchange$Model== input$Select_model2)
+      })
+      
+      observe({
+        category_choices <- subset(data_download_LUchange,data_download_LUchange$Variable== input$Select_variable2)
+        updateSelectInput(session, "Select_model2", choices = unique(category_choices$Model))
+      })
+      
+      #Show data in table
+      output$outTable_LUchange <- renderDT({
+        datatable(filtered_data_LUchange(), options = list(pageLength = 10),
+                  rownames = FALSE)
+      })
+      
+      # Downloadable csv of selected dataset ----
+      output$downloadData_LUchange <- downloadHandler(
+        filename = function() {
+          paste("data_", input$Select_variable2, "_", input$Select_RCP2, "_", input$Select_model2, ".csv", sep = "")
+        },
+        content = function(file) {
+          write.csv(filtered_data_LUchange(), file, row.names = FALSE)
+        }
+      )
+      
+      
+      
     })
+  })
+  
+  #--------------------------------------------------------------------------------
+  #RUNS THE SIMULATIONS LAND MANAGEMENT SCENARIO
+  #---------------------------------------------------------------------------------
+  
+  output$plot_land_management<- renderPlot({
+    #this allows to run LM scenario even if the previous panels were not run
+    req(any(
+      !is.null(input$clay_slider2),
+      !is.null(input$clay_slider),
+      !is.null(input$clay)
+    ))
+
+    req(input$MR_slider)
+    req(input$HR_slider)
+
+    #This extracts the first available clay value:
+    #either from land use change scenario, or from fixed land-use scenario or from user input$clay
+    clay_val <- NULL
+    if (!is.null(input$clay_slider2)) {
+      clay_val <- input$clay_slider2
+    } else if (!is.null(input$clay_slider)) {
+      clay_val <- input$clay_slider
+    } else if (!is.null(input$clay)) {
+      clay_val <- input$clay
+    }
+    req(clay_val)
     
-    observe({
-      category_choices <- subset(data_download_LM,data_download_LM$Variable== input$Select_variable3)
-      updateSelectInput(session, "Select_model3", choices = unique(category_choices$Model))
-    })
     
-    #Show data in table
-    output$outTable_LM <- renderDT({
-      datatable(filtered_data_LM(), options = list(pageLength = 10),
-                rownames = FALSE)
-    })
-    
-    # Downloadable csv of selected dataset ----
-    output$downloadData_LM <- downloadHandler(
-      filename = function() {
-        paste("data_", input$Select_variable3, "_", input$Select_RCP3, "_", input$Select_model3, ".csv", sep = "")
-      },
-      content = function(file) {
-        write.csv(filtered_data_LM(), file, row.names = FALSE)
-      }
-    )
-    
-    
+    # Create 0-row data frame which will be used to store data
+    dat <- data.frame(x = numeric(0), y = numeric(0))
+    ######################################################################################################
+    withProgress(message = 'Processing', value = 0, {
+      # Number of times we'll go through the loop
+      n_progr<-10
+      i_progr<-1
+      
+      # Each time through the loop, add another row of data. This is
+      # a stand-in for a long-running computation.
+      dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+      # Increment the progress bar, and update the detail text.
+      incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+      
+      print("Entering plot_land_management")
+      #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>#
+      #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>#
+      print("Retrieving climate data from user inputs")
+      #data_clim_user =upload_user_clim_data_site()
+      
+      #Fwd
+      # Potevap_month = data_clim_user[[1]]
+      # Temp_day = data_clim_user[[2]]
+      # Precip_day = data_clim_user[[3]]
+      # Vswc_day = data_clim_user[[4]]
+      #Fwd
+      Potevap_month = data_potevap()
+      # Each time through the loop, add another row of data. This is
+      # a stand-in for a long-running computation.
+      dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+      # Increment the progress bar, and update the detail text.
+      i_progr<-i_progr+1
+      incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+      
+      Temp_day = data_temperature()
+      
+      # Each time through the loop, add another row of data. This is
+      # a stand-in for a long-running computation.
+      dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+      # Increment the progress bar, and update the detail text.
+      i_progr<-i_progr+1
+      incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+      
+      Precip_day = data_precipitation()
+      
+      # Each time through the loop, add another row of data. This is
+      # a stand-in for a long-running computation.
+      dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+      # Increment the progress bar, and update the detail text.
+      i_progr<-i_progr+1
+      incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+      
+      
+      Vswc_day = data_vswc()
+      
+      # Each time through the loop, add another row of data. This is
+      # a stand-in for a long-running computation.
+      dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+      # Increment the progress bar, and update the detail text.
+      i_progr<-i_progr+1
+      incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+      
+      # print("Potevap_month")
+      # print(head(Potevap_month))
+      # 
+      # print("Temp_day")
+      # print(head(Temp_day))
+      # 
+      # print("Precip_day")
+      # print(head(Precip_day))
+      # 
+      # print("Vswc_day")
+      # print(head(Vswc_day))
+      
+      #Spinup
+      #data_clim_user_spinup = upload_user_spinup_clim_data_site()
+      print("Creating spinup climate variables")
+      Potevap_month_spinup = data_potevap_spinup()
+      Temp_day_spinup = data_temp_spinup()
+      Precip_day_spinup = data_prec_spinup()
+      Vswc_day_spinup = data_vswc_spinup()
+      
+      # print("Potevap_month_spinup")
+      # print(head(Potevap_month_spinup))
+      # 
+      # print("Temp_day_spinup")
+      # print(head(Temp_day_spinup))
+      # 
+      # print("Precip_day_spinup")
+      # print(head(Precip_day_spinup))
+      # 
+      # print("Vswc_day_spinup")
+      # print(head(Vswc_day_spinup))
+      
+      
+      
+      #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<#
+      #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<#
+      
+      #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>#
+      
+      #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>#
+      print("Retrieving C input for control land-management")
+      
+      retreive_Cinput_ag_rcp26_fix=data_Cinput_ag()
+      retreive_Cinput_bg_rcp26_fix=data_Cinput_bg()
+      #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      #Cin TOT contol scenario (time series)
+      retreive_Cinput_rcp26_fix = retreive_Cinput_ag_rcp26_fix+retreive_Cinput_bg_rcp26_fix
+      print("retreive_Cinput_rcp26_fix")
+      print(retreive_Cinput_rcp26_fix)
+      
+      # Each time through the loop, add another row of data. This is
+      # a stand-in for a long-running computation.
+      dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+      # Increment the progress bar, and update the detail text.
+      i_progr<-i_progr+1
+      incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+      
+      
+      print("Retrieving C biomass in vegetation to calculate C input after disturbance event")
+      ######################################################
+      #C input from died vegetation at year of disturbance
+      ######################################################
+      #cveg
+      #retreive_Cbiomass_rcp26 = retreive_Cbiomass(lon_veg_clitter_rcp26,lat_veg_clitter_rcp26,veg_clitter_time_rcp26,veg_clitter_rcp26,input$year_disturbance)
+      retreive_Cbiomass_rcp26_AG<-input$AG_biomass
+      retreive_Cbiomass_rcp26_BG<-input$BG_biomass
+      
+      Cinput_disturbance_vec<- calculate_Cin_mortality_event(retreive_Cinput_ag_rcp26_fix,retreive_Cinput_bg_rcp26_fix,
+                                                             retreive_Cbiomass_rcp26_AG, retreive_Cbiomass_rcp26_BG,input$MR_slider,input$HR_slider)
+      Cinput_disturbance_ag<-Cinput_disturbance_vec[[1]]
+      Cinput_disturbance_bg<-Cinput_disturbance_vec[[2]]
+      
+      Cinput_disturbance<-Cinput_disturbance_ag+Cinput_disturbance_bg
+      
+      print("Cinput_disturbance")
+      print(Cinput_disturbance)
+      
+      # Each time through the loop, add another row of data. This is
+      # a stand-in for a long-running computation.
+      dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+      # Increment the progress bar, and update the detail text.
+      i_progr<-i_progr+1
+      incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+      
+      AWEN_input = c(as.numeric(input$A_pool),
+                     as.numeric(input$W_pool),
+                     as.numeric(input$E_pool),
+                     as.numeric(input$N_pool),
+                     0)
+      
+      #Suppose W and E litter compounds are more labile
+      decomposable_plant_material <-as.numeric(input$W_pool)+as.numeric(input$E_pool)
+      #Suppose A and N litter compounds are more resistant
+      resistant_plant_material <-as.numeric(input$A_pool)+as.numeric(input$N_pool)
+      #Decomposable to resistant ratio
+      DR_in = decomposable_plant_material/resistant_plant_material
+      
+      #CHANGE
+      computation_time_step_fwd = 1
+      simulation_length_LMscenario = simulation_length()
+      
+      ######
+      print("Preparing to run control land management scenario")
+      ######
+      #This will launch the function defined in "Holisoils_multimodel_v1.R"
+      test_mm_control_LM <-Call_MULTIMODEL_i1(plot_figures=plot_figures,simulation_length=simulation_length_LMscenario, spinup_length=spinup_length,
+                                              computation_time_step_fwd=computation_time_step_fwd,
+                                              start_date_simulations=dates_in(),
+                                              temperature_spinup=Temp_day_spinup, precipitation_spinup=Precip_day_spinup, potential_evapotranspiration_spinup=Potevap_month_spinup,
+                                              soilmoisture_spinup=as.numeric(Vswc_day_spinup$Vswc),
+                                              temperature_fwd=Temp_day, precipitation_fwd=Precip_day, potential_evapotranspiration_fwd=Potevap_month,soilmoisture_fwd=as.numeric(Vswc_day$Vswc),
+                                              SOC_0=input$SOC,
+                                              C_input_ag_spinup=as.numeric(mean(retreive_Cinput_ag_rcp26_fix)),C_input_bg_spinup=as.numeric(mean(retreive_Cinput_bg_rcp26_fix)),
+                                              C_input_ag_fwd=as.numeric(retreive_Cinput_ag_rcp26_fix),C_input_bg_fwd=as.numeric(retreive_Cinput_bg_rcp26_fix),
+                                              clay_p=clay_val,silt_p=input$silt,soil_thickness=input$soilthick,pH_p=ph_site,
+                                              lignin_to_nitrogen=input$LNratio,structural_in_lignin=input$SLratio,woodylittersize=input$WLS,AWEN_in=AWEN_input,decomp_to_resist_ratio=DR_in,
+                                              CN_Ratio=input$CNratio, Bulk_Density=input$bulkdensity, WFPS=water_filled_pore_space, CH4_Conc=input$CH4_data,
+                                              decomposition_param_RothC=ksRothC,
+                                              decomposition_param_ICBM=param_ICBM,
+                                              decomposition_param_Century=ksCent,
+                                              decomposition_param_Yasso07=paramYasso07,
+                                              decomposition_param_Yasso20=paramYasso20)
+      
+      print("End of multimodel simulation Control LM")
+      print(" ")
+      print("...Plotting control LM completed...")
+      
+      # Each time through the loop, add another row of data. This is
+      # a stand-in for a long-running computation.
+      dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+      # Increment the progress bar, and update the detail text.
+      i_progr<-i_progr+1
+      incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+      
+      t_fwd_col = seq.int(1,simulation_length_LMscenario,by=computation_time_step_fwd)
+      
+      
+      data_mmctrLM <- get_data_from_multimodel_run(test_mm_control_LM,t_fwd_col)
+      minCctrLM=data_mmctrLM[[1]]
+      maxCctrLM=data_mmctrLM[[2]]
+      mmmean_totCctrLM=data_mmctrLM[[3]]
+      totC_Roth_C_ctrLM=data_mmctrLM[[4]]
+      totC_ICBM_C_ctrLM=data_mmctrLM[[5]]
+      totC_Century_C_ctrLM=data_mmctrLM[[6]]
+      totC_Yasso07_C_ctrLM=data_mmctrLM[[7]]
+      totC_YASSO20_C_ctrLM=data_mmctrLM[[8]]
+      minFctrLM=data_mmctrLM[[9]]
+      maxFctrLM=data_mmctrLM[[10]]
+      mmmean_totFctrLM=data_mmctrLM[[11]]
+      totF_Roth_C_ctrLM=data_mmctrLM[[12]]
+      totF_ICBM_C_ctrLM=data_mmctrLM[[13]]
+      totF_Century_C_ctrLM=data_mmctrLM[[14]]
+      totF_Yasso07_C_ctrLM=data_mmctrLM[[15]]
+      totF_YASSO20_C_ctrLM=data_mmctrLM[[16]]
+      
+      totF_SG_C_ctrLM=data_mmctrLM[[17]]
+      totCH4_SG_C_ctrLM=data_mmctrLM[[18]]
+      totN2O_SG_C_ctrLM=data_mmctrLM[[19]]
+      
+      ###########################    ###########################
+      print("Preparing to run disturbance event scenario")
+      ###########################    ###########################
+      #This will launch the function defined in "Holisoils_multimodel_v1.R"
+      test_mm_disturbance_LM <- Call_MULTIMODEL_i1(plot_figures=plot_figures,simulation_length=simulation_length_LMscenario, spinup_length=spinup_length,
+                                                   computation_time_step_fwd=computation_time_step_fwd,
+                                                   start_date_simulations=dates_in(),
+                                                   temperature_spinup=Temp_day_spinup, precipitation_spinup=Precip_day_spinup, potential_evapotranspiration_spinup=Potevap_month_spinup,
+                                                   soilmoisture_spinup=as.numeric(Vswc_day_spinup$Vswc),
+                                                   temperature_fwd=Temp_day, precipitation_fwd=Precip_day, potential_evapotranspiration_fwd=Potevap_month,soilmoisture_fwd=as.numeric(Vswc_day$Vswc),
+                                                   SOC_0=input$SOC,
+                                                   C_input_ag_spinup=as.numeric(mean(retreive_Cinput_ag_rcp26_fix)),C_input_bg_spinup=as.numeric(mean(retreive_Cinput_bg_rcp26_fix)),
+                                                   C_input_ag_fwd=as.numeric(Cinput_disturbance_ag),C_input_bg_fwd=as.numeric(Cinput_disturbance_bg),
+                                                   clay_p=clay_val,silt_p=input$silt,soil_thickness=input$soilthick,pH_p=ph_site,
+                                                   lignin_to_nitrogen=input$LNratio,structural_in_lignin=input$SLratio,woodylittersize=input$WLS,AWEN_in=AWEN_input,decomp_to_resist_ratio=DR_in,
+                                                   CN_Ratio=input$CNratio, Bulk_Density=input$bulkdensity, WFPS=water_filled_pore_space, CH4_Conc=input$CH4_data,
+                                                   decomposition_param_RothC=ksRothC,
+                                                   decomposition_param_ICBM=param_ICBM,
+                                                   decomposition_param_Century=ksCent,
+                                                   decomposition_param_Yasso07=paramYasso07,
+                                                   decomposition_param_Yasso20=paramYasso20)
+      
+      print("End of multimodel simulation disturbance event scenario")
+      print(" ")
+      print("...Plotting disturbance event scenario completed...")
+      
+      # Each time through the loop, add another row of data. This is
+      # a stand-in for a long-running computation.
+      dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+      # Increment the progress bar, and update the detail text.
+      i_progr<-i_progr+1
+      incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+      
+      data_mmdistLM <- get_data_from_multimodel_run(test_mm_disturbance_LM,t_fwd_col)
+      minCdistLM=data_mmdistLM[[1]]
+      maxCdistLM=data_mmdistLM[[2]]
+      mmmean_totCdistLM=data_mmdistLM[[3]]
+      totC_Roth_C_distLM=data_mmdistLM[[4]]
+      totC_ICBM_C_distLM=data_mmdistLM[[5]]
+      totC_Century_C_distLM=data_mmdistLM[[6]]
+      totC_Yasso07_C_distLM=data_mmdistLM[[7]]
+      totC_YASSO20_C_distLM=data_mmdistLM[[8]]
+      minFdistLM=data_mmdistLM[[9]]
+      maxFdistLM=data_mmdistLM[[10]]
+      mmmean_totFdistLM=data_mmdistLM[[11]]
+      totF_Roth_C_distLM=data_mmdistLM[[12]]
+      totF_ICBM_C_distLM=data_mmdistLM[[13]]
+      totF_Century_C_distLM=data_mmdistLM[[14]]
+      totF_Yasso07_C_distLM=data_mmdistLM[[15]]
+      totF_YASSO20_C_distLM=data_mmdistLM[[16]]
+      
+      totF_SG_C_distLM=data_mmdistLM[[17]]
+      totCH4_SG_C_distLM=data_mmdistLM[[18]]
+      totN2O_SG_C_distLM=data_mmdistLM[[19]]
+      
+      ###########################
+      #Plot STOCKS COMPARISON CC
+      ###########################
+      express_plotC = expression("SOC stocks (MgC"~{ha}^{-1}~")")
+      
+      minC <- min(cbind(minCctrLM,minCdistLM))
+      maxC <- max(cbind(maxCctrLM,maxCdistLM))
+      
+      t_fwd = seq(1,simulation_length_LMscenario,by=computation_time_step_fwd)
+
+      par(mar=c(6, 4, 4, 3))
+      
+      plot(t_fwd, mmmean_totCctrLM, type="l", lty=1, lwd=3, xlab="Time (years)",ylab=" ",col="black",ylim=c(minC-5,maxC+5))
+      lines(t_fwd,totC_Roth_C_ctrLM,type="l", lty=1, lwd=1, col=alpha("black",0.3))
+      lines(t_fwd,totC_ICBM_C_ctrLM,type="l", lty=1,lwd=1, col=alpha("black",0.3))
+      lines(t_fwd,totC_Century_C_ctrLM,type="l", lty=1,lwd=1, col=alpha("black",0.3))
+      lines(t_fwd,totC_Yasso07_C_ctrLM,type="l", lty=1,lwd=1, col=alpha("black",0.3))
+      lines(t_fwd,totC_YASSO20_C_ctrLM,type="l", lty=1,lwd=1, col=alpha("black",0.3))
+      title(ylab=express_plotC,main="Multi-model SOC stocks",mgp=c(2,1,0))
+      
+      lines(t_fwd,mmmean_totCdistLM,type="l", lty=1,lwd=3, col="#00b159")
+      lines(t_fwd,totC_Roth_C_distLM,type="l", lty=1,lwd=1, col=alpha("#00b159",0.3))
+      lines(t_fwd,totC_ICBM_C_distLM,type="l", lty=1,lwd=1, col=alpha("#00b159",0.3))
+      lines(t_fwd,totC_Century_C_distLM,type="l", lty=1,lwd=1, col=alpha("#00b159",0.3))
+      lines(t_fwd,totC_Yasso07_C_distLM,type="l", lty=1,lwd=1, col=alpha("#00b159",0.3))
+      lines(t_fwd,totC_YASSO20_C_distLM,type="l", lty=1,lwd=1, col=alpha("#00b159",0.3))
+      
+      legend(par('usr')[2], par('usr')[4], c("Control", "Disturbance"),
+             lty=1,lwd=c(3,3), col=c("black","#00b159"), cex=1,xpd=NA,bty="n")
+      
+      #PLOT FLUXES COMPARISON CC
+      express_plotF = expression(CO[2]~"flux (MgC"~{ha}^{-1}*{year}^{-1}~")")
+      
+      minF <- min(cbind(minFctrLM,minFdistLM))
+      maxF <- max(cbind(maxFctrLM,maxFdistLM))
+      
+      plot(t_fwd, mmmean_totFctrLM, type="l", lty=1, lwd=3, xlab="Time (years)",ylab=" ",col="black",ylim=c(minF-2,maxF+2))
+      lines(t_fwd,totF_Roth_C_ctrLM,type="l", lty=1, lwd=1, col=alpha("black",0.3))
+      lines(t_fwd,totF_ICBM_C_ctrLM,type="l", lty=1,lwd=1, col=alpha("black",0.3))
+      lines(t_fwd,totF_Century_C_ctrLM,type="l", lty=1,lwd=1, col=alpha("black",0.3))
+      lines(t_fwd,totF_Yasso07_C_ctrLM,type="l", lty=1,lwd=1, col=alpha("black",0.3))
+      lines(t_fwd,totF_YASSO20_C_ctrLM,type="l", lty=1,lwd=1, col=alpha("black",0.3))
+      lines(t_fwd,totF_SG_C_ctrLM,type="l", lty=1,lwd=1, col=alpha("black",0.3))
+      title(ylab=express_plotF,main= expression(bold("Multi-model "~CO[2]~"fluxes")),mgp=c(2,1,0))
+      
+      lines(t_fwd,mmmean_totFdistLM,type="l", lty=1,lwd=3, col="#00b159")
+      lines(t_fwd,totF_Roth_C_distLM,type="l", lty=1,lwd=1, col=alpha("#00b159",0.3))
+      lines(t_fwd,totF_ICBM_C_distLM,type="l", lty=1,lwd=1, col=alpha("#00b159",0.3))
+      lines(t_fwd,totF_Century_C_distLM,type="l", lty=1,lwd=1, col=alpha("#00b159",0.3))
+      lines(t_fwd,totF_Yasso07_C_distLM,type="l", lty=1,lwd=1, col=alpha("#00b159",0.3))
+      lines(t_fwd,totF_YASSO20_C_distLM,type="l", lty=1,lwd=1, col=alpha("#00b159",0.3))
+      lines(t_fwd,totF_SG_C_distLM,type="l", lty=1,lwd=1, col=alpha("#00b159",0.3))
+      
+      legend(par('usr')[2], par('usr')[4], c("Control", "Disturbance"),
+             lty=1,lwd=c(3,3), col=c("black","#00b159"), cex=1,xpd=NA,bty="n")
+      
+      
+      # Each time through the loop, add another row of data. This is
+      # a stand-in for a long-running computation.
+      dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
+      # Increment the progress bar, and update the detail text.
+      i_progr<-i_progr+1
+      incProgress(1/n_progr, detail = paste(round(i_progr/n_progr*100,0)," % done"))
+      
+      ########################
+      ########################
+      #Create data for download
+      data_download_LM <-create_dataframe_for_download(t_fwd,
+                                                       data_mmctrLM,
+                                                       data_mmdistLM,
+                                                       "Control",
+                                                       "Disturbance")
+      # Filter data based on user input
+      filtered_data_LM <- reactive({
+        
+        subset(data_download_LM,data_download_LM$Variable== input$Select_variable3
+               & data_download_LM$Scenario== input$Select_RCP3
+               & data_download_LM$Model== input$Select_model3)
+      })
+      
+      observe({
+        category_choices <- subset(data_download_LM,data_download_LM$Variable== input$Select_variable3)
+        updateSelectInput(session, "Select_model3", choices = unique(category_choices$Model))
+      })
+      
+      #Show data in table
+      output$outTable_LM <- renderDT({
+        datatable(filtered_data_LM(), options = list(pageLength = 10),
+                  rownames = FALSE)
+      })
+      
+      # Downloadable csv of selected dataset ----
+      output$downloadData_LM <- downloadHandler(
+        filename = function() {
+          paste("data_", input$Select_variable3, "_", input$Select_RCP3, "_", input$Select_model3, ".csv", sep = "")
+        },
+        content = function(file) {
+          write.csv(filtered_data_LM(), file, row.names = FALSE)
+        }
+      )
+      
+    })#withprogress
   }) #renderPlot
   
   
@@ -5183,7 +6641,7 @@ in French Long-Term Experiments.”
   
   
   link_to_documentation<-tags$a(h4(style = "display: inline;","Documentation."), 
-                                href="Documentation_multimodel_webtool.pdf",target = "_blank")
+                                href="Documentation_multimodel_webtool_me4soc.pdf",target = "_blank")
   
   output$Download_documentation <- renderUI({
     tagList(HTML("<h4 style='text-align: justify;display: inline;'>
@@ -5206,7 +6664,7 @@ in French Long-Term Experiments.”
   
   
   link_to_documentation3<-tags$a(h4("Download documentation"), 
-                                 href="Documentation_multimodel_webtool.pdf",target = "_blank")
+                                 href="Documentation_multimodel_webtool_me4soc.pdf",target = "_blank")
   output$Download_documentation3 <- renderUI({
     link_to_documentation3
   })
@@ -5221,8 +6679,8 @@ in French Long-Term Experiments.”
   # })
   
   output$tabHOLI2 <- renderUI({
-    tagList(HTML("<h4 style='text-align: justify;display: inline;'>This webtool was designed within the "),
-    url7,HTML("<h4 style='text-align: justify;display: inline;'> - Holistic management practices, 
+    tagList(HTML("<h4 style='text-align: justify;display: inline;'>This webtool was designed by Elisa Bruni for the "),
+            url7,HTML("<h4 style='text-align: justify;display: inline;'> - Holistic management practices, 
          modelling and monitoring European forest soils - project framework. Holisoils 
          is a <span class='bolder-text'>Horizon 2020</span> project that
          aims to harmonise available soil monitoring information
@@ -5230,10 +6688,29 @@ in French Long-Term Experiments.”
          climate and sustainability goals.</h4>"))
   })
   
+  output$tabHOLI1 <- renderUI({
+    tagList(HTML("<h4 style='text-align: justify;display: inline;'>This webtool was designed by Elisa Bruni for the "),
+            url7,HTML("<h4 style='text-align: justify;display: inline;'> project.</h4>"))
+  })
+  
+  
   url_githubcode <- a(h4("Code", style = "display: inline;"), 
                       href="https://github.com/elisabruni/Multimodel_interface",target = "_blank")
   output$githubcode <- renderUI({
     url_githubcode
+  })
+
+  url_licence_me4soc <- tagList(
+    a(
+      h4("CC BY-NC 4.0", style = "display: inline;"),
+      href = "https://creativecommons.org/licenses/by-nc/4.0/",
+      target = "_blank"
+    ),
+    h4(" (Non-Commercial Use Only)", style = "display: inline; font-weight: normal;")
+  )
+
+  output$licence_me4soc<- renderUI({
+    url_licence_me4soc
   })
   
   

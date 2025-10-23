@@ -37,15 +37,16 @@ Call_RothC_i1<-function(plot_figures,
   #Convert daily to monthly temperature
   temperature_spinup_RothC = aggregate(temperature_spinup, list(format(temperature_spinup$Date,"%Y-%m")),mean, na.rm = TRUE)
   temperature_fwd_RothC = aggregate(temperature_fwd, list(format(temperature_fwd$Date,"%Y-%m")),mean, na.rm = TRUE)
-  
-  print("temperature conversion ok")
+  # print(head(temperature_fwd_RothC$Temp))
+  # print("temperature conversion ok")
   
   #Convert daily precipitation to monthly precipitation
   precipitation_spinup_RothC <- aggregate(precipitation_spinup["Precip"], list(format(precipitation_spinup$Date,"%Y-%m")),FUN=sum, na.rm = TRUE)
   precipitation_fwd_RothC <- aggregate(precipitation_fwd["Precip"], list(format(precipitation_fwd$Date,"%Y-%m")),FUN=sum, na.rm = TRUE)
  
-  # print("Precipitation length:") 
+  # print("Precipitation length:")
   # print(length(precipitation_fwd_RothC$Precip))
+  # print(head(precipitation_fwd_RothC$Precip))
   # print("precipitation conversion ok")
   
   #Monthly potential evapotranspiration
@@ -92,6 +93,7 @@ Call_RothC_i1<-function(plot_figures,
                           DR=decomp_to_resist_ratio,
                           In=InRothC_spinup,clay=clay_p, xi=xi.frame_spinup_RothC)
   
+  #print("spinup ok")
   #Get SOC spinup
   CRothC_spinup=getC(RothC_spinup)
   
